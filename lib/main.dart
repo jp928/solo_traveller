@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:solo_traveller/screens/getStartScreen.dart';
-import 'package:solo_traveller/screens/loginScreen.dart';
+import 'package:solo_traveller/screens/get_start_screen.dart';
+import 'package:solo_traveller/screens/login_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,9 +22,12 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
         // backgroundColor: Color(0xffEFEFEF)
         // backgroundColor: Colors.red
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor:  Color.fromRGBO(79, 152, 248, 1)
+        ),
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page!'),
     );
