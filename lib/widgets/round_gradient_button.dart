@@ -4,11 +4,13 @@ class RoundedGradientButton extends StatelessWidget {
   final String buttonText;
   final double width;
   final Function onPressed;
+  final bool transparent;
 
   RoundedGradientButton({
     required this.buttonText,
     required this.width,
     required this.onPressed,
+    this.transparent = false,
   });
 
   @override
@@ -17,11 +19,11 @@ class RoundedGradientButton extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: Container(
         decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black26, offset: Offset(0, 4), blurRadius: 5.0)
-          ],
-          gradient: LinearGradient(
+          // boxShadow: [
+          //   BoxShadow(
+          //       color: Colors.black26, offset: Offset(0, 4), blurRadius: 5.0)
+          // ],
+          gradient: this.transparent ? null : LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             stops: [0.0, 1.0],
@@ -30,7 +32,7 @@ class RoundedGradientButton extends StatelessWidget {
               Color.fromRGBO(79, 152, 248, 1)
             ],
           ),
-          color: Colors.deepPurple.shade300,
+          color: Color(0xffF4F4F4),
           borderRadius: BorderRadius.circular(28),
         ),
         child: ElevatedButton(
@@ -38,6 +40,11 @@ class RoundedGradientButton extends StatelessWidget {
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(28.0),
+                side: this.transparent ?
+                BorderSide(
+                  color: Color.fromRGBO(113, 140, 250, 1),
+                  width: 2
+                ) : BorderSide.none
               ),
             ),
             minimumSize: MaterialStateProperty.all(Size(width, 56)),
@@ -58,7 +65,7 @@ class RoundedGradientButton extends StatelessWidget {
               buttonText,
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.white,
+                color: this.transparent ? Color.fromRGBO(113, 140, 250, 1) : Colors.white,
               ),
             ),
           ),
