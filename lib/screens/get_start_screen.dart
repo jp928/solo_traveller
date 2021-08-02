@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/futures/register_future.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
+import 'package:solo_traveller/screens/create_profile_screen.dart';
 
 import 'login_screen.dart';
 
@@ -18,11 +21,34 @@ class GetStartScreen extends StatelessWidget {
       return;
     }
 
-    bool result =
-        await register(_emailController.text, _passwordController.text);
+    bool result = false;
+    try {
+      result = await register(_emailController.text, _passwordController.text);
+    } on Exception catch (e) {
+      showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Failed'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          ));
+    }
 
+    // If success
     if (result) {
-      Navigator.pop(context);
+      Navigator.push(
+          context,
+          new MaterialPageRoute(
+              builder: (context) => new CreateProfileScreen()));
     }
   }
 
@@ -52,15 +78,15 @@ class GetStartScreen extends StatelessWidget {
                   children: <Widget>[
                     Image.asset('assets/images/icon.png'),
                     Padding(
-                        padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                        padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
                         child: Text(
                           'Get started',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400),
+                              fontSize: 24, fontWeight: FontWeight.w400),
                         )),
                     Padding(
-                        padding: EdgeInsets.symmetric(vertical: 15),
+                        padding: EdgeInsets.symmetric(vertical: 16),
                         child: Text(
                           'Sign up for new account, enter your email and get started.',
                           textAlign: TextAlign.center,
@@ -178,7 +204,7 @@ class GetStartScreen extends StatelessWidget {
                                   Text('Prefer to log in with Facebook?'),
                                   RoundedGradientButton(
                                     transparent: true,
-                                    buttonText: 'Register',
+                                    buttonText: 'Login with Facebook',
                                     width: 300,
                                     onPressed: () {
                                       Navigator.pushReplacement(
