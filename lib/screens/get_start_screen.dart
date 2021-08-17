@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/futures/register_future.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';

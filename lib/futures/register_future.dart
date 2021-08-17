@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 Future<bool> register(String email, String password) async {
   final response = await http.post(
-    Uri.parse('https://solodevelopment.ml/account/register'),
+    Uri.parse('https://solodevelopment.tk/account/register'),
     headers: <String, String>{
       'Content-Type': 'application/json',
     },
