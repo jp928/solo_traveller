@@ -16,40 +16,40 @@ class GetStartScreen extends StatelessWidget {
   final _registerForm = GlobalKey<FormState>();
 
   void _register(context) async {
-    final isValid = _registerForm.currentState!.validate();
-    if (!isValid) {
-      return;
-    }
-
-    bool result = false;
-    try {
-      result = await register(_emailController.text, _passwordController.text);
-    } on Exception catch (e) {
-      showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Failed'),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'Cancel'),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
-          ));
-    }
-
-    // If success
-    if (result) {
+    // final isValid = _registerForm.currentState!.validate();
+    // if (!isValid) {
+    //   return;
+    // }
+    //
+    // bool result = false;
+    // try {
+    //   result = await register(_emailController.text, _passwordController.text);
+    // } on Exception catch (e) {
+    //   showDialog<String>(
+    //       context: context,
+    //       builder: (BuildContext context) => AlertDialog(
+    //         title: const Text('Failed'),
+    //         content: Text(e.toString()),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context, 'Cancel'),
+    //             child: const Text('Cancel'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context, 'OK'),
+    //             child: const Text('OK'),
+    //           ),
+    //         ],
+    //       ));
+    // }
+    //
+    // // If success
+    // if (result) {
       Navigator.push(
           context,
           new MaterialPageRoute(
               builder: (context) => new CreateProfileScreen()));
-    }
+      // }
   }
 
   @override

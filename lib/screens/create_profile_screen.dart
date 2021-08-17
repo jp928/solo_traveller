@@ -1,13 +1,20 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/widgets/outline_text_field.dart';
+
 
 class CreateProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController _firstNameController = TextEditingController();
+    DateTime _selectedDate = DateTime.now();
 
+    String selectedYear = 'Year of birth';
     final _createProfileForm = GlobalKey<FormState>();
+
+    double total = 1;
+    FixedExtentScrollController firstController = FixedExtentScrollController(initialItem: 0);
 
     return Scaffold(
         appBar: AppBar(
@@ -67,8 +74,6 @@ class CreateProfileScreen extends StatelessWidget {
                                                 hintText: 'Your first name',
                                               ),
 
-
-
                                                CountryCodePicker(
                                                   onChanged: print,
                                                   // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
@@ -100,7 +105,60 @@ class CreateProfileScreen extends StatelessWidget {
                                                     ),
                                                     child: countryCode == null ? Text('Country you\'re from') : Text(countryCode.name.toString())
                                                   ),
-                                                ),
+                                               ),
+                                              Container(
+                                                  height: 56,
+                                                  width: double.infinity,
+                                                  alignment: Alignment.centerLeft,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(6),
+                                                      border: Border.all(
+                                                        width: 1.6,
+                                                        color: Color.fromRGBO(218, 218, 236, 1),
+                                                      )
+                                                  ),
+                                                  child: CupertinoPicker(
+                                                    itemExtent: 200.toDouble(),
+                                                    // itemExtent: this.itemExtent,
+                                                    scrollController: firstController,
+                                                    onSelectedItemChanged: (int index) {
+                                                      print(index);
+                                                    },
+                                                    children: List<Widget>.generate(10, (int index) {
+                                                      return Center(
+                                                        child: Text(
+                                                          (++index).toString(),
+                                                        ),
+                                                      );
+                                                    }),
+                                                  ),
+                                                  // child: TextButton(
+                                                  //   child: Text(selectedYear, textAlign: TextAlign.left,),
+                                                  //   onPressed: () async {
+                                                  //     DateTime? newDateTime = await showRoundedDatePicker(
+                                                  //       context: context,
+                                                  //       initialDatePickerMode: DatePickerMode.year,
+                                                  //       initialDate: DateTime
+                                                  //           .now(),
+                                                  //       firstDate: DateTime(
+                                                  //           DateTime
+                                                  //               .now()
+                                                  //               .year - 1),
+                                                  //       lastDate: DateTime(
+                                                  //           DateTime
+                                                  //               .now()
+                                                  //               .year + 1),
+                                                  //       borderRadius: 2,
+                                                  //     );
+                                                  //     print(newDateTime);
+                                                  //     if (newDateTime != null) {
+                                                  //       selectedYear = newDateTime.year.toString();
+                                                  //     }
+                                                  //   }
+                                                  // ),
+                                              )
+
                                             ]))))
                           ])),
                 ))));
