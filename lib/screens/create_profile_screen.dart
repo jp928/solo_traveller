@@ -1,6 +1,7 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:solo_traveller/constants/colors.dart';
 import 'package:solo_traveller/widgets/outline_text_field.dart';
 import 'package:solo_traveller/widgets/years_picker.dart';
 
@@ -121,16 +122,25 @@ class CreateProfileScreen extends StatelessWidget {
                                                     height: 56,
                                                     width: double.infinity,
                                                     alignment: Alignment.centerLeft,
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 2),
                                                     decoration: BoxDecoration(
                                                         borderRadius: BorderRadius.circular(6),
                                                         border: Border.all(
                                                           width: 1.6,
-                                                          color: Color.fromRGBO(218, 218, 236, 1),
+                                                          color: placeholderGrey,
                                                         )
                                                     ),
                                                     child: TextButton(
-                                                      child: Text(selectedYear, textAlign: TextAlign.left),
+                                                      child: Text(
+                                                          selectedYear,
+                                                          textAlign: TextAlign.left,
+                                                          style: TextStyle(
+                                                              color: placeholderGrey,
+                                                              fontFamily: 'Roboto',
+                                                              fontWeight: FontWeight.w400,
+                                                              fontSize: 16
+                                                          ),
+                                                      ),
                                                       onPressed: () {
                                                         _showYearsPicker();
                                                       }),

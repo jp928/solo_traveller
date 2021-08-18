@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solo_traveller/constants/colors.dart';
 
 class OutlineTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -18,13 +19,22 @@ class OutlineTextField extends StatelessWidget {
       decoration: InputDecoration(
         border: OutlineInputBorder(
             borderSide: new BorderSide(
-                color: Color.fromRGBO(
-                    218, 218, 236, 1))),
+                width: 1.6,
+                color:
+                  // Color.fromRGBO(218, 218, 236, 1)
+                  placeholderGrey
+                )
+          ),
         focusedBorder: OutlineInputBorder(
             borderSide: new BorderSide(
-                color: Color.fromRGBO(
-                    79, 152, 248, 1))),
+                color:
+                  Color.fromRGBO(79, 152, 248, 1)
+                )
+        ),
         hintText: hintText,
+        hintStyle: TextStyle(
+          color: placeholderGrey
+        )
       ),
       validator: this.validator,
       autocorrect: false,
