@@ -1,30 +1,43 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'dart:developer';
+
 class YearsPicker extends StatefulWidget {
   final Function(String) onChange;
+  final String? initValue;
 
-  const YearsPicker({Key? key, required this.onChange}) : super(key: key);
+  const YearsPicker({Key? key, required this.onChange, this.initValue}) : super(key: key);
   @override
   _YearsPickerWidgetState createState() => _YearsPickerWidgetState();
 }
 
 class _YearsPickerWidgetState extends State<YearsPicker> {
+  // String selectedYear = '';
+  final List<String> listOfYears = List.generate(
+      100,
+      (index) {
+        return (DateTime.now().year - 16 - index).toString();
+      }
+  );
+
+  int get initialItem => widget.initValue == null ? 0 : listOfYears.indexOf(widget.initValue!);
+
   Widget yearPicker() {
     return CupertinoPicker(
-      scrollController: FixedExtentScrollController(initialItem: 0),
+      scrollController: FixedExtentScrollController(initialItem: initialItem),
       magnification: 1.1,
       // backgroundColor: beachRed[50],
       onSelectedItemChanged: (x) {
-        setState(() {});
-        // widget.onChange('$currentTimeInHour Hr $currentTimeInMin mins');
+        // setState(() {});
+        widget.onChange(listOfYears[x]);
       },
       children: List.generate(
           100,
           (index) {
             return Center(
               child: Text(
-                  (DateTime.now().year - 16 - index).toString()
+                  listOfYears[index]
               ),
             );
           }
@@ -35,8 +48,6 @@ class _YearsPickerWidgetState extends State<YearsPicker> {
     );
   }
 
-  String currentTimeInHour = '';
-  String currentTimeInMin = '';
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
@@ -67,7 +78,6 @@ class _YearsPickerWidgetState extends State<YearsPicker> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Expanded(child: yearPicker()),
-                        // Expanded(child: durationPicker(inMinutes: true)),
                       ],
                     )),
               ),

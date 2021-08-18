@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               Image.asset('assets/images/walkthrough.png'),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
+                padding: EdgeInsets.symmetric(vertical: 30),
                 child: Text(
                   'Find and connect with people near you when you travel',
                   textAlign: TextAlign.center,
