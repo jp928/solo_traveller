@@ -20,6 +20,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   Widget build(BuildContext context) {
     final TextEditingController _firstNameController = TextEditingController();
     final _createProfileForm = GlobalKey<FormState>();
+    RangeValues _currentRangeValues = const RangeValues(40, 80);
 
     void _showYearsPicker() {
       showModalBottomSheet(
@@ -153,6 +154,41 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                                       _showYearsPicker();
                                                     }),
                                               ),
+                                              Container(
+                                                height: 96,
+                                                width: double.infinity,
+                                                alignment: Alignment.centerLeft,
+                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(6),
+                                                    border: Border.all(
+                                                      width: 1.6,
+                                                      color: Color.fromRGBO(218, 218, 236, 1),
+                                                    )
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text('Show age range in feed'),
+                                                    RangeSlider(
+                                                      values: _currentRangeValues,
+                                                      min: 16,
+                                                      max: 100,
+                                                      divisions: 1,
+                                                      labels: RangeLabels(
+                                                        _currentRangeValues.start.round().toString(),
+                                                        _currentRangeValues.end.round().toString(),
+                                                      ),
+                                                      onChanged: (RangeValues values) {
+                                                        setState(() {
+                                                          _currentRangeValues = values;
+                                                        });
+                                                      },
+                                                    )
+                                                  ],
+                                                ),
+                                              )
                                             ]))))
                           ])),
                 ))));
