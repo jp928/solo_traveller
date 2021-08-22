@@ -1,46 +1,16 @@
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-
-class Setting {
-  final int minFeedAge;
-  final int maxFeedAge;
-
-  Setting(this.maxFeedAge, this.minFeedAge);
-
-  Setting.fromJson(Map<String, dynamic> json)
-      : maxFeedAge = json['maxFeedAge'],
-        minFeedAge = json['minFeedAge'];
-
-  Map<String, dynamic> toJson() => {
-    'maxFeedAge': maxFeedAge,
-    'minFeedAge': minFeedAge,
-  };
-}
-
-class Profile {
-  final Setting setting;
-  final String firstName;
-  final String dateOfBirth;
-
-  Profile(this.firstName, this.dateOfBirth, this.setting);
-
-  Profile.fromJson(Map<String, dynamic> json)
-      : setting = json['setting'],
-        firstName = json['firstName'],
-        dateOfBirth = json['dateOfBirth'];
-
-  Map<String, dynamic> toJson() => {
-    'setting': setting,
-    'firstName': firstName,
-    'dateOfBirth': dateOfBirth,
-  };
-}
+import 'package:solo_traveller/models/profile.dart';
 
 Future<bool> updateProfile(Profile profile) async {
-  final response = await http.post(
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  String? token = await secureStorage.read(key: 'token');
+  final response = await http.put(
     Uri.parse('https://solodevelopment.tk/account/update_profile'),
     headers: <String, String>{
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
     },
     body: jsonEncode(profile),
   );
@@ -48,8 +18,17 @@ Future<bool> updateProfile(Profile profile) async {
   if (response.statusCode == 200) {
     return true;
   } else {
-    Map<String, dynamic> data = jsonDecode(response.body);
-    var message = data['message'] ?? 'Failed';
+    var message = 'Failed';
+
+    if (response.statusCode == 401) {
+      //TODO: refresh token here
+      return updateProfile(profile);
+    }
+
+    if (response.body.isNotEmpty) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      message = data['message'] ?? 'Failed';
+    }
     // If the server did not return a 201 CREATED response,
     // then throw an exception.
     throw Exception(message);

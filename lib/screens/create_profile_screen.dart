@@ -1,10 +1,17 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/constants/colors.dart';
+import 'package:solo_traveller/futures/update_profile_future.dart';
+import 'package:solo_traveller/models/profile.dart';
+import 'package:solo_traveller/models/settings.dart';
 import 'package:solo_traveller/widgets/outline_text_field.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 class CreateProfileScreen extends StatefulWidget {
@@ -22,41 +29,79 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   final _createProfileForm = GlobalKey<FormState>();
   RangeValues _currentRangeValues = const RangeValues(16, 80);
 
+  final ImagePicker _picker = ImagePicker();
+  XFile? _image;
+
+  _imgFromCamera() async {
+    XFile? image = await _picker.pickImage(
+        source: ImageSource.camera,
+        // imageQuality: 50,
+        maxHeight: 200,
+        maxWidth: 200,
+    );
+
+    setState(() {
+      _image = image!;
+    });
+  }
+
+  _imgFromGallery() async {
+    XFile? image = await  _picker.pickImage(
+      source: ImageSource.gallery,
+      // imageQuality: 50,
+      maxHeight: 200,
+      maxWidth: 200,
+    );
+
+    setState(() {
+      _image = image!;
+    });
+  }
+
   void _saveProfile(context) async {
     // final isValid = _registerForm.currentState!.validate();
     // if (!isValid) {
     //   return;
     // }
     //
-    // bool result = false;
-    // try {
-    //   result = await register(_emailController.text, _passwordController.text);
-    // } on Exception catch (e) {
-    //   showDialog<String>(
-    //       context: context,
-    //       builder: (BuildContext context) => AlertDialog(
-    //         title: const Text('Failed'),
-    //         content: Text(e.toString()),
-    //         actions: <Widget>[
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context, 'Cancel'),
-    //             child: const Text('Cancel'),
-    //           ),
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context, 'OK'),
-    //             child: const Text('OK'),
-    //           ),
-    //         ],
-    //       ));
-    // }
-    //
-    // // If success
-    // if (result) {
-    //   Navigator.push(
-    //       context,
-    //       new MaterialPageRoute(
-    //           builder: (context) => new CreateProfileScreen()));
-    // }
+    bool result = false;
+    try {
+      Profile profile = Profile(
+        _firstNameController.text,
+        DateFormat('yyyy-MM-dd').format(selectedDate!),
+        Settings(
+          _currentRangeValues.start.toInt(),
+          _currentRangeValues.end.toInt(),
+        )
+      );
+      result = await updateProfile(profile);
+    } on Exception catch (e) {
+      showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Failed'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          ));
+    }
+
+    // If success
+    if (result) {
+      log('Success');
+      // Navigator.push(
+      //     context,
+      //     new MaterialPageRoute(
+      //         builder: (context) => new CreateProfileScreen()));
+    }
   }
 
   void _showDatePicker(context) {
@@ -82,7 +127,36 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         });
   }
 
-
+  void _showImagePicker (context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: new Wrap(
+                children: <Widget>[
+                  new ListTile(
+                      leading: new Icon(Icons.photo_library),
+                      title: new Text('Photo Library'),
+                      onTap: () {
+                        _imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
+                  new ListTile(
+                    leading: new Icon(Icons.photo_camera),
+                    title: new Text('Camera'),
+                    onTap: () {
+                      _imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+    );
+  }
 
 
   @override
@@ -108,6 +182,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
+
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
@@ -125,6 +200,64 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                 style: const TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.w400),
                               ),
+                            ),
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      _showImagePicker(context);
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 52,
+                                      backgroundColor: Color.fromRGBO(79, 152, 248, 1),
+                                      child: _image != null
+                                          ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(50),
+                                        child: Image.file(
+                                          File(_image!.path),
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.fitHeight,
+                                        ),
+                                      )
+                                          : Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(50)),
+                                        width: 100,
+                                        height: 100,
+                                        child: Icon(
+                                          Icons.camera_alt_outlined,
+                                          size: 40,
+                                          color: Colors.grey[800],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                                    child:  Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Add profile pic'),
+                                        Text(
+                                            'Adding a photo will help to verify your profile',
+                                            softWrap: true,
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                            )
+                                          // overflow: TextOverflow.,
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              )
                             ),
                             Expanded(
                                 child: Padding(

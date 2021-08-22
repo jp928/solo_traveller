@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/futures/register_future.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
@@ -44,9 +46,10 @@ class GetStartScreen extends StatelessWidget {
     // If success
     if (result) {
       Navigator.push(
-          context,
-          new MaterialPageRoute(
-              builder: (context) => new CreateProfileScreen()));
+        context,
+        new MaterialPageRoute(
+          builder: (context) => new CreateProfileScreen())
+        );
       }
   }
 

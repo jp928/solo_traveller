@@ -5,11 +5,13 @@ class OutlineTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String? Function(String?)? validator;
+  final bool? obscureText;
 
   OutlineTextField({
     required this.controller,
     required this.hintText,
-    this.validator
+    this.validator,
+    this.obscureText
   });
 
   @override
@@ -38,7 +40,7 @@ class OutlineTextField extends StatelessWidget {
       ),
       validator: this.validator,
       autocorrect: false,
-      obscureText: true,
+      obscureText: obscureText ?? false,
     );
   }
 }
