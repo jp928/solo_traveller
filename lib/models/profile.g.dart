@@ -10,10 +10,12 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['firstName'] as String,
       json['dateOfBirth'] as String,
       Settings.fromJson(json['settings'] as Map<String, dynamic>),
+      json['chatAccountId'] as int?,
     );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'settings': instance.settings.toJson(),
       'firstName': instance.firstName,
       'dateOfBirth': instance.dateOfBirth,
+      'chatAccountId': instance.chatAccountId,
     };

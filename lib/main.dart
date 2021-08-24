@@ -1,14 +1,42 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:solo_traveller/providers/my_cube_session.dart';
+import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
 import 'package:solo_traveller/screens/login_screen.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
+import 'package:connectycube_sdk/connectycube_sdk.dart';
+import 'package:connectivity/connectivity.dart';
 
 void main() {
-  runApp(MyApp());
+  // Init ConnectyCube
+  init('802', 'xfa-UKcGfX3q3q9', 'Ev3jDG52EKBKPDv');
+  runApp(
+    /// Providers are above [MyApp] instead of inside it, so that tests
+    /// can use [MyApp] while mocking the providers
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<MyCubeSession>(create: (_) => MyCubeSession()),
+        ChangeNotifierProvider<MyCubeUser>(create: (_) => MyCubeUser()),
+      ],
+      child: App(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class App extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _AppState();
+  }
+}
+
+class _AppState extends State<App> with WidgetsBindingObserver {
+  late StreamSubscription<ConnectivityResult> connectivityStateSubscription;
+  late AppLifecycleState appState;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,11 +55,70 @@ class MyApp extends StatelessWidget {
         // backgroundColor: Color(0xffEFEFEF)
         // backgroundColor: Colors.red
         textSelectionTheme: TextSelectionThemeData(
-          cursorColor:  Color.fromRGBO(79, 152, 248, 1)
+            cursorColor:  Color.fromRGBO(79, 152, 248, 1)
         ),
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page!'),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Firebase.initializeApp();
+
+    init('802', 'xfa-UKcGfX3q3q9', 'Ev3jDG52EKBKPDv',
+        onSessionRestore: () async {
+          return createSession(context.read<MyCubeUser>().user);
+        });
+
+    connectivityStateSubscription =
+        Connectivity().onConnectivityChanged.listen((connectivityType) {
+          if (AppLifecycleState.resumed != appState) return;
+
+          if (connectivityType != ConnectivityResult.none) {
+            log("chatConnectionState = ${CubeChatConnection.instance.chatConnectionState}");
+            bool isChatDisconnected =
+                CubeChatConnection.instance.chatConnectionState ==
+                    CubeChatConnectionState.Closed ||
+                    CubeChatConnection.instance.chatConnectionState ==
+                        CubeChatConnectionState.ForceClosed;
+
+            if (isChatDisconnected &&
+                CubeChatConnection.instance.currentUser != null) {
+              CubeChatConnection.instance.relogin();
+            }
+          }
+        });
+
+    appState = WidgetsBinding.instance!.lifecycleState!;
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    connectivityStateSubscription.cancel();
+
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    log("Current app state: $state");
+    appState = state;
+
+    if (AppLifecycleState.paused == state) {
+      if (CubeChatConnection.instance.isAuthenticated()) {
+        CubeChatConnection.instance.logout();
+      }
+    } else if (AppLifecycleState.resumed == state) {
+      CubeUser? user = context.read<MyCubeUser>().user;
+      if (user != null && !CubeChatConnection.instance.isAuthenticated()) {
+        CubeChatConnection.instance.login(user);
+      }
+    }
   }
 }
 

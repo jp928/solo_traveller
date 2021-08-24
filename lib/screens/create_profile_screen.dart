@@ -4,10 +4,14 @@ import 'dart:io';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/constants/colors.dart';
+import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
 import 'package:solo_traveller/futures/update_profile_future.dart';
 import 'package:solo_traveller/models/profile.dart';
 import 'package:solo_traveller/models/settings.dart';
+import 'package:solo_traveller/providers/my_cube_session.dart';
+import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/outline_text_field.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 import 'package:intl/intl.dart';
@@ -46,7 +50,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   }
 
   _imgFromGallery() async {
-    XFile? image = await  _picker.pickImage(
+    XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
       // imageQuality: 50,
       maxHeight: 200,
@@ -58,7 +62,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     });
   }
 
-  void _saveProfile(context) async {
+  void _saveProfile(BuildContext context) async {
     // final isValid = _registerForm.currentState!.validate();
     // if (!isValid) {
     //   return;
@@ -66,13 +70,17 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     //
     bool result = false;
     try {
+      MyCubeUser user = context.read<MyCubeUser>();
+      user.setName(_firstNameController.text);
+      await createConnectyCubeSession(context);
       Profile profile = Profile(
         _firstNameController.text,
         DateFormat('yyyy-MM-dd').format(selectedDate!),
         Settings(
           _currentRangeValues.start.toInt(),
           _currentRangeValues.end.toInt(),
-        )
+        ),
+        user.user!.id!
       );
       result = await updateProfile(profile);
     } on Exception catch (e) {

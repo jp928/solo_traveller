@@ -1,7 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/futures/register_future.dart';
+import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 import 'package:solo_traveller/screens/create_profile_screen.dart';
 
@@ -15,7 +15,7 @@ class GetStartScreen extends StatelessWidget {
 
   final _registerForm = GlobalKey<FormState>();
 
-  void _register(context) async {
+  void _register(BuildContext context) async {
     final isValid = _registerForm.currentState!.validate();
     if (!isValid) {
       return;
@@ -23,6 +23,7 @@ class GetStartScreen extends StatelessWidget {
 
     bool result = false;
     try {
+      context.read<MyCubeUser>().setEmail(_emailController.text);
       result = await register(_emailController.text, _passwordController.text);
     } on Exception catch (e) {
       showDialog<String>(
