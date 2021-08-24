@@ -12,8 +12,9 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xffF4F4F4),
+        shadowColor: Colors.transparent,
         iconTheme: IconThemeData(
-          color: Color.fromRGBO(79, 152, 248, 1)
+          color: Color.fromRGBO(74, 90, 247, 1), //change your color here
         ),
       ),
       body: SafeArea(
