@@ -4,11 +4,11 @@ import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_session.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 
-Future<void> createConnectyCubeSession(BuildContext context) async {
+Future<CubeUser?> createConnectyCubeSession(BuildContext context) async {
   CubeSettings.instance.isDebugEnabled = true;
   MyCubeUser myCubeUser = context.read<MyCubeUser>();
   await createSession();
-  log('=======>>>(1)');
+
   CubeUser user = CubeUser(
       // login: myCubeUser.email,
       email: myCubeUser.email,
@@ -17,8 +17,12 @@ Future<void> createConnectyCubeSession(BuildContext context) async {
   );
 
   await signUp(user);
+
+  log(user.toString());
   myCubeUser.setUser(user);
 
   final session = await createSession(user);
   context.read<MyCubeSession>().setSession(session);
+
+  return session.user;
 }
