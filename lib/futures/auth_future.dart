@@ -21,7 +21,6 @@ Future<bool> auth(String email, String password) async {
     if (response.body.isNotEmpty) {
       Map<String, dynamic> authMap = jsonDecode(response.body);
       var auth = Auth.fromJson(authMap);
-
       await secureStorage.write(key: 'token', value: auth.token);
       await secureStorage.write(key: 'refreshToken', value: auth.refreshToken);
     }

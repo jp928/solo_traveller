@@ -200,7 +200,9 @@ class GetStartScreen extends StatelessWidget {
                                           context,
                                           new MaterialPageRoute(
                                               builder: (context) =>
-                                                  new LoginScreen()));
+                                                  new LoginScreen()
+                                          )
+                                      );
                                     },
                                   ),
                                   Text('Prefer to log in with Facebook?'),

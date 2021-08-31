@@ -1,11 +1,65 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
+import 'package:solo_traveller/futures/auth_future.dart';
+import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
+import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
+
+import 'moment_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final _loginForm = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void _login(BuildContext context) async {
+    // final isValid = _loginForm.currentState!.validate();
+    // if (!isValid) {
+    //   return;
+    // }
+
+    bool result = false;
+    // try {
+    //   var email = _emailController.text;
+    //   MyCubeUser user = context.read<MyCubeUser>();
+    //   user.setEmail(email);
+    //
+    //   await createConnectyCubeSession(context, withSignUp: false);
+    //   result = await auth(email, _passwordController.text);
+    //
+    // } on Exception catch (e) {
+    //   showDialog<String>(
+    //       context: context,
+    //       builder: (BuildContext context) => AlertDialog(
+    //         title: const Text('Failed'),
+    //         content: Text(e.toString()),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context, 'Cancel'),
+    //             child: const Text('Cancel'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context, 'OK'),
+    //             child: const Text('OK'),
+    //           ),
+    //         ],
+    //       ));
+    // }
+
+    // If success
+    // if (result) {
+    Navigator.pushReplacement(
+        context,
+        new MaterialPageRoute(
+            builder: (context) =>
+            new MomentScreen()
+        )
+    );
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,22 +162,14 @@ class LoginScreen extends StatelessWidget {
                                     RoundedGradientButton(
                                       buttonText: 'Log in',
                                       width: 300,
-                                      onPressed: () {
-
-                                      },
+                                      onPressed: () => _login(context),
                                     ),
                                     Text('Can\'t login? Reset you password'),
                                     RoundedGradientButton(
                                       transparent: true,
                                       buttonText: 'Login with Facebook',
                                       width: 300,
-                                      onPressed: () {
-                                        Navigator.pushReplacement(
-                                            context,
-                                            new MaterialPageRoute(
-                                                builder: (context) =>
-                                                new LoginScreen()));
-                                      },
+                                      onPressed: () => _login(context)
                                     ),
                                   ],
                                 ),
