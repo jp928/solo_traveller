@@ -5,10 +5,12 @@ import 'package:flutter/foundation.dart';
 class MyCubeUser with ChangeNotifier, DiagnosticableTreeMixin {
   String? _email;
   String? _name;
+  String? _profileImage;
   CubeUser? _user;
 
   String? get email => _email;
   String? get name => _name;
+  String? get profileImage => _profileImage;
   CubeUser? get user => _user;
 
   void setEmail(String email) {
@@ -21,6 +23,10 @@ class MyCubeUser with ChangeNotifier, DiagnosticableTreeMixin {
 
   void setUser(CubeUser user) {
     this._user = user;
+  }
+
+  void setProfileImage(String profileImage) {
+    this._profileImage = profileImage;
   }
 
   @override

@@ -1,9 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/futures/auth_future.dart';
+import 'package:solo_traveller/futures/create_connecty_cube_session_with_facebook_future.dart';
 import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
+import 'package:solo_traveller/futures/external_auth_future.dart';
+import 'package:solo_traveller/futures/facebook_login_future.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 
@@ -15,50 +16,110 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login(BuildContext context) async {
-    // final isValid = _loginForm.currentState!.validate();
-    // if (!isValid) {
-    //   return;
-    // }
+  void _loginWithFacebook(BuildContext context) async {
+    Map<String, dynamic>? facebookUserData = await facebookLogin();
 
     bool result = false;
-    // try {
-    //   var email = _emailController.text;
-    //   MyCubeUser user = context.read<MyCubeUser>();
-    //   user.setEmail(email);
-    //
-    //   await createConnectyCubeSession(context, withSignUp: false);
-    //   result = await auth(email, _passwordController.text);
-    //
-    // } on Exception catch (e) {
-    //   showDialog<String>(
-    //       context: context,
-    //       builder: (BuildContext context) => AlertDialog(
-    //         title: const Text('Failed'),
-    //         content: Text(e.toString()),
-    //         actions: <Widget>[
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context, 'Cancel'),
-    //             child: const Text('Cancel'),
-    //           ),
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context, 'OK'),
-    //             child: const Text('OK'),
-    //           ),
-    //         ],
-    //       ));
-    // }
+    if (facebookUserData != null) {
+      String email = facebookUserData['email'];
+      MyCubeUser cubeUser = context.read<MyCubeUser>();
+      cubeUser.setEmail(email);
+      cubeUser.setName(facebookUserData['name']);
+      cubeUser.setProfileImage(facebookUserData['picture']['data']['url']);
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Center(child: CircularProgressIndicator(),);
+          }
+      );
+
+      try {
+        result = await externalAuth(email, facebookUserData['id']);
+        await createConnectyCubeSessionWithFacebook(context, facebookUserData['accessToken']);
+      } on Exception catch (e) {
+        // Dismiss loading
+        Navigator.pop(context);
+        showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Failed'),
+              content: Text(e.toString()),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            )
+        );
+      }
+
+      // Dismiss loading
+      Navigator.pop(context);
+
+      if (result) {
+        Navigator.pushReplacement(
+            context,
+            new MaterialPageRoute(
+                builder: (context) =>
+                new MomentScreen()
+            )
+        );
+      }
+
+    }
+  }
+
+  void _login(BuildContext context) async {
+    final isValid = _loginForm.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+
+    bool result = false;
+    try {
+      var email = _emailController.text;
+      MyCubeUser user = context.read<MyCubeUser>();
+      user.setEmail(email);
+
+      await createConnectyCubeSession(context, withSignUp: false);
+      result = await auth(email, _passwordController.text);
+
+    } on Exception catch (e) {
+      showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Failed'),
+          content: Text(e.toString()),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'Cancel'),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ],
+        )
+      );
+    }
 
     // If success
-    // if (result) {
-    Navigator.pushReplacement(
-        context,
-        new MaterialPageRoute(
-            builder: (context) =>
-            new MomentScreen()
-        )
-    );
-    // }
+    if (result) {
+      Navigator.pushReplacement(
+          context,
+          new MaterialPageRoute(
+              builder: (context) =>
+              new MomentScreen()
+          )
+      );
+    }
   }
 
   @override
@@ -169,7 +230,7 @@ class LoginScreen extends StatelessWidget {
                                       transparent: true,
                                       buttonText: 'Login with Facebook',
                                       width: 300,
-                                      onPressed: () => _login(context)
+                                      onPressed: () => _loginWithFacebook(context)
                                     ),
                                   ],
                                 ),

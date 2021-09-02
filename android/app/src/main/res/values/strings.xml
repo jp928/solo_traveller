@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">solotraveller</string>
+    <string name="facebook_app_id">780026535381100</string>
+    <string name="fcm_sender_id">210750538697</string>
+    <string name="fb_login_protocol_scheme">fb780026535381100</string>
+</resources>

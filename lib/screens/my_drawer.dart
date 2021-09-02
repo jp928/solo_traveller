@@ -12,7 +12,7 @@ class MyDrawer extends StatelessWidget {
       child: MediaQuery.removePadding(
         context: context,
         //移除抽屉菜单顶部默认留白
-        removeTop: true,
+        // removeTop: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -23,10 +23,11 @@ class MyDrawer extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: ClipOval(
-                      child: Image.asset(
-                        "imgs/avatar.png",
-                        width: 80,
-                      ),
+                      child: Icon(Icons.camera),
+                      // child: Image.asset(
+                      //   // "imgs/avatar.png",
+                      //   width: 80,
+                      // ),
                     ),
                   ),
                   Text(
