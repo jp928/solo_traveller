@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 
+import 'moment_screen.dart';
+
 class OneMoreStepScreen extends StatelessWidget {
 
   @override
@@ -39,7 +41,15 @@ class OneMoreStepScreen extends StatelessWidget {
                             clipBehavior: Clip.hardEdge,
                             color: Colors.blueAccent,
                             child: InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    new MaterialPageRoute(
+                                        builder: (context) =>
+                                        new MomentScreen()
+                                    )
+                                );
+                              },
                             )
                           ),
                         )
