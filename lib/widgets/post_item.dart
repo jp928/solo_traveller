@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:solo_traveller/constants/colors.dart';
 import 'package:solo_traveller/models/post.dart';
 
 class PostItem extends StatelessWidget {

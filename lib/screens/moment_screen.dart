@@ -77,68 +77,99 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
       body: TabBarView(
         controller: _tabController,
         children: tabs.map((e) {
-          return Container(
-            alignment: Alignment.center,
-            child: Column(children: <Widget>[
-              // ListTile(title:Text('Moment')),
-              Expanded(
-                child: _posts.length == 0 ?
-                Center(
-                  child: Column(
-                    children: [
-                      Padding(padding: EdgeInsets.only(top: 32)),
-                      loading ?
-                      new CircularProgressIndicator()
-                      :
-                      IconButton(
-                        icon: const Icon(Icons.refresh_outlined),
-                        tooltip: 'Refresh',
-                        onPressed: () {
-                          _retrievePosts(1);
+          return Stack(
+            children: <Widget>[
+              SafeArea(
+                top: false,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Column(children: <Widget>[
+                    Expanded(
+                      child: _posts.length == 0 ?
+                      Center(
+                        child: Column(
+                          children: [
+                            Padding(padding: EdgeInsets.only(top: 32)),
+                            loading ?
+                            new CircularProgressIndicator()
+                                :
+                            IconButton(
+                              icon: const Icon(Icons.refresh_outlined),
+                              tooltip: 'Refresh',
+                              onPressed: () {
+                                _retrievePosts(1);
+                              },
+                            )
+                          ],
+                        ),
+                      ) :
+                      ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: _posts.length,
+                        itemBuilder: (context, index) {
+
+                          if (index == _posts.length - 1) {
+                            int pageNum = (_posts.length / 20).ceil() + 1;
+                            _retrievePosts(pageNum);
+                          }
+
+                          return PostItem(post: _posts[index]);
                         },
-                      )
-                    ],
+                        separatorBuilder: (context, index) => Divider(height: .0),
+                      ),
+                    ),
+                  ]),
+                )
+              ),
+
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10,bottom: 10,top: 10),
+                    height: 60,
+                    width: double.infinity,
+                    color: Color(0xffF4F4F4),
+                    child: Row(
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: (){
+                          },
+                          child: Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.lightBlue,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Icon(Icons.add, color: Colors.white, size: 20, ),
+                          ),
+                        ),
+                        SizedBox(width: 15,),
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                                hintText: "Write message...",
+                                hintStyle: TextStyle(color: Colors.black54),
+                                border: InputBorder.none
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 15,),
+                        FloatingActionButton(
+                          onPressed: (){},
+                          child: Icon(Icons.send,color: Colors.white,size: 18,),
+                          backgroundColor: Colors.blue,
+                          elevation: 0,
+                        ),
+                      ],
+
+                    ),
                   ),
                 )
-                :
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: _posts.length,
-                  itemBuilder: (context, index) {
-                    //如果到了表尾
-                    if (index == _posts.length - 1) {
-                      int pageNum = (_posts.length / 20).ceil() + 1;
-                      _retrievePosts(pageNum);
-                      // if (_posts.length - 1 < 20) {
-                      //   //获取数据
-                      //   _retrieveData();
-                      //   //加载时显示loading
-                      //   return Container(
-                      //     padding: const EdgeInsets.all(16.0),
-                      //     alignment: Alignment.center,
-                      //     child: SizedBox(
-                      //         width: 24.0,
-                      //         height: 24.0,
-                      //         child: CircularProgressIndicator(strokeWidth: 2.0)
-                      //     ),
-                      //   );
-                      // } else {
-                      //   //已经加载了100条数据，不再获取数据。
-                      //   return Container(
-                      //       alignment: Alignment.center,
-                      //       padding: EdgeInsets.all(16.0),
-                      //       child: Text("没有更多了", style: TextStyle(color: Colors.grey),)
-                      //   );
-                      // }
-                    }
-                    //显示单词列表项
-                    return PostItem(post: _posts[index]);
-                  },
-                  separatorBuilder: (context, index) => Divider(height: .0),
-                ),
-              )
-                ,
-            ]),
+              ),
+            ],
           );
         }).toList(),
       )

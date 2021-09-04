@@ -14,7 +14,6 @@ class Post {
     return this.firstName == null && this.lastName == null ? 'unknown' : "${this.firstName ?? ''} ${this.lastName ?? ''}";
   }
 
-
   Post(this.firstName, this.lastName, this.body, this.profileImage, this.imageUrl, this.created);
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
