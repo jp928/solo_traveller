@@ -15,6 +15,7 @@ class PostItem extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.0, top: 10),
       child: ListTile(
         onTap: () {
+          FocusScope.of(context).unfocus();
           // print(news.web_link);
           // Navigator.push(context, MaterialPageRoute(builder: (context) => NewsDetailsPage(news)));
         },

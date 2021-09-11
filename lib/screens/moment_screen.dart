@@ -1,7 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:solo_traveller/futures/get_posts_future.dart';
+import 'package:solo_traveller/futures/upload_moment_image_future.dart';
 import 'package:solo_traveller/models/post.dart';
 import 'package:solo_traveller/widgets/post_item.dart';
 
@@ -15,6 +18,10 @@ class MomentScreen extends StatefulWidget {
 class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List tabs = ['#ALL MOMENTS', '#ALL PEOPLE'];
+  final TextEditingController _postTextController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+  XFile? _image;
 
   var _posts = <Post>[];
 
@@ -24,8 +31,6 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _tabController = TabController(length: tabs.length, vsync: this);
-
-    log("here");
 
     setState(() {
       loading = true;
@@ -46,6 +51,91 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
     });
   }
 
+  void _createPost() async {
+    if (_image != null) {
+      var body = _postTextController.text;
+      try {
+        final response = await uploadMomentImage(File(_image!.path), body);
+        log(response.toString());
+      } on Exception catch (e) {
+        showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Failed'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          )
+        );
+      }
+    }
+  }
+
+  _imgFromCamera() async {
+    XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      // imageQuality: 50,
+      maxHeight: 200,
+      maxWidth: 200,
+    );
+
+    setState(() {
+      _image = image!;
+    });
+  }
+
+  _imgFromGallery() async {
+    XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      // imageQuality: 50,
+      maxHeight: 200,
+      maxWidth: 200,
+    );
+
+    setState(() {
+      _image = image!;
+    });
+  }
+
+  void _showImagePicker (context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                    leading: new Icon(Icons.photo_library),
+                    title: new Text('Photo Library'),
+                    onTap: () {
+                      _imgFromGallery();
+                      Navigator.of(context).pop();
+                    }),
+                new ListTile(
+                  leading: new Icon(Icons.photo_camera),
+                  title: new Text('Camera'),
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,9 +149,8 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
 
         leading: Builder(builder: (context) {
           return IconButton(
-            icon: Icon(Icons.dehaze_sharp, color: Colors.black54), //自定义图标
+            icon: Icon(Icons.dehaze_sharp, color: Colors.black54),
             onPressed: () {
-              // 打开抽屉菜单
               Scaffold.of(context).openDrawer();
             },
           );
@@ -127,44 +216,69 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
                 child: SafeArea(
                   top: false,
                   child: Container(
-                    padding: EdgeInsets.only(left: 10,bottom: 10,top: 10),
+                    padding: EdgeInsets.only(left: 10,bottom: 10,top: 10,right: 10),
                     height: 60,
                     width: double.infinity,
                     color: Color(0xffF4F4F4),
                     child: Row(
                       children: <Widget>[
-                        GestureDetector(
-                          onTap: (){
-                          },
-                          child: Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              color: Colors.lightBlue,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Icon(Icons.add, color: Colors.white, size: 20, ),
-                          ),
-                        ),
-                        SizedBox(width: 15,),
+                        SizedBox(width: 8,),
                         Expanded(
                           child: TextField(
+                            controller: _postTextController,
+                            maxLines: 15,
                             decoration: InputDecoration(
-                                hintText: "Write message...",
-                                hintStyle: TextStyle(color: Colors.black54),
-                                border: InputBorder.none
+                              hintText: 'Type a message',
+                              hintStyle: TextStyle(color: Colors.black54),
+                              border: InputBorder.none
                             ),
                           ),
                         ),
-                        SizedBox(width: 15,),
+                        SizedBox(width: 8,),
+                        Ink(
+                          decoration: const ShapeDecoration(
+                            color: Colors.lightBlue,
+                            shape: CircleBorder(),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.photo_library_outlined),
+                            color: Colors.grey,
+                            onPressed: () {
+                              _showImagePicker(context);
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8,),
                         FloatingActionButton(
-                          onPressed: (){},
-                          child: Icon(Icons.send,color: Colors.white,size: 18,),
-                          backgroundColor: Colors.blue,
+                          shape: BeveledRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                            side: BorderSide(
+                              color: Colors.grey,
+                              width: 1
+                            )
+                          ),
+                          backgroundColor: Colors.transparent,
+                          onPressed: () {
+                            log('Hi');
+                            _createPost();
+                          },
+                          child: Text(
+                            'Send',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          // child: TextButton(
+                          //   child: Text('Send'),
+                          //   style: TextButton.styleFrom(
+                          //     primary: Colors.grey,
+                          //     // backgroundColor: Colors.teal,
+                          //     onSurface: Colors.grey,
+                          //   ),
+                          //
+                          // ),
+                          // backgroundColor: Colors.blue,
                           elevation: 0,
                         ),
                       ],
-
                     ),
                   ),
                 )

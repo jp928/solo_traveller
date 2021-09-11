@@ -115,6 +115,9 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       }
     } else if (AppLifecycleState.resumed == state) {
       CubeUser? user = context.read<MyCubeUser>().user;
+
+      log('=======>>>>');
+      print(user);
       if (user != null && !CubeChatConnection.instance.isAuthenticated()) {
         CubeChatConnection.instance.login(user);
       }

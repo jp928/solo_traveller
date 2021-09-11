@@ -28,10 +28,10 @@ class LoginScreen extends StatelessWidget {
       cubeUser.setProfileImage(facebookUserData['picture']['data']['url']);
 
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Center(child: CircularProgressIndicator(),);
-          }
+        context: context,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator(),);
+        }
       );
 
       try {
@@ -41,21 +41,21 @@ class LoginScreen extends StatelessWidget {
         // Dismiss loading
         Navigator.pop(context);
         showDialog<String>(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-              title: const Text('Failed'),
-              content: Text(e.toString()),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'OK'),
-                  child: const Text('OK'),
-                ),
-              ],
-            )
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Failed'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          )
         );
       }
 
@@ -71,7 +71,6 @@ class LoginScreen extends StatelessWidget {
             )
         );
       }
-
     }
   }
 
@@ -80,6 +79,13 @@ class LoginScreen extends StatelessWidget {
     if (!isValid) {
       return;
     }
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator(),);
+        }
+    );
 
     bool result = false;
     try {
@@ -91,6 +97,7 @@ class LoginScreen extends StatelessWidget {
       result = await auth(email, _passwordController.text);
 
     } on Exception catch (e) {
+      Navigator.pop(context);
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
@@ -109,6 +116,8 @@ class LoginScreen extends StatelessWidget {
         )
       );
     }
+
+    Navigator.pop(context);
 
     // If success
     if (result) {
@@ -139,28 +148,27 @@ class LoginScreen extends StatelessWidget {
             },
             child: SingleChildScrollView(
                 child: Container(
-                  // height: 500,
                   height: 800,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Image.asset('assets/images/icon.png'),
                       Padding(
-                          padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-                          child: Text(
-                            'Log in',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.w400),
-                          )),
+                        padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+                        child: Text(
+                          'Log in',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w400),
+                        )),
                       Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Text(
-                            'Type in your email and password',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w400),
-                          )),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          'Type in your email and password',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w400),
+                        )),
                       Expanded(
                           child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 25),

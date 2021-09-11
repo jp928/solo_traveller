@@ -9,23 +9,22 @@ Future<CubeUser?> createConnectyCubeSession(
     { bool withSignUp = true }) async {
   CubeSettings.instance.isDebugEnabled = true;
   MyCubeUser myCubeUser = context.read<MyCubeUser>();
-  await createSession();
 
   CubeUser user = CubeUser(
-      // login: myCubeUser.email,
       email: myCubeUser.email,
       password: myCubeUser.email,
       fullName: myCubeUser.name
   );
 
   if (withSignUp) {
-    await signUp(user);
+    user = await signUp(user);
   } else {
-    await signIn(user);
+    user = await signIn(user);
   }
 
   log(user.toString());
   myCubeUser.setUser(user);
+  user.password = myCubeUser.email;
 
   final session = await createSession(user);
   context.read<MyCubeSession>().setSession(session);

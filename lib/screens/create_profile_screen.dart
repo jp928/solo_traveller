@@ -1,6 +1,4 @@
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:connectycube_sdk/connectycube_calls.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,13 +9,11 @@ import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
 import 'package:solo_traveller/futures/update_profile_future.dart';
 import 'package:solo_traveller/models/profile.dart';
 import 'package:solo_traveller/models/settings.dart';
-import 'package:solo_traveller/providers/my_cube_session.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/outline_text_field.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'one_more_step_screen.dart';
 
 
@@ -83,10 +79,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       MyCubeUser user = context.read<MyCubeUser>();
       user.setName(_firstNameController.text);
       CubeUser? _cubeUser =  await createConnectyCubeSession(context);
-
-      log("<===========");
-      log(_cubeUser?.id.toString());
-      log("===========>");
 
       Profile profile = Profile(
         _firstNameController.text,
@@ -155,32 +147,32 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
   void _showImagePicker (context) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SafeArea(
-            child: Container(
-              child: new Wrap(
-                children: <Widget>[
-                  new ListTile(
-                      leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
-                      onTap: () {
-                        _imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
-                    onTap: () {
-                      _imgFromCamera();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                  leading: new Icon(Icons.photo_library),
+                  title: new Text('Photo Library'),
+                  onTap: () {
+                    _imgFromGallery();
+                    Navigator.of(context).pop();
+                  }),
+                new ListTile(
+                  leading: new Icon(Icons.photo_camera),
+                  title: new Text('Camera'),
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
-          );
-        }
+          ),
+        );
+      }
     );
   }
 
