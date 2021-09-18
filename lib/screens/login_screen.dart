@@ -30,7 +30,7 @@ class LoginScreen extends StatelessWidget {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return Center(child: CircularProgressIndicator(),);
+          return Center(child: CircularProgressIndicator());
         }
       );
 

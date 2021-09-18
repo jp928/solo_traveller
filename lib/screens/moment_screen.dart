@@ -36,14 +36,17 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
       loading = true;
     });
     // Retrieve first
-    _retrievePosts(1);
+    _retrievePosts(1, isRefresh: true);
   }
 
-  void _retrievePosts(int pageNum) async {
+  Future<void> _retrievePosts(int pageNum, { bool isRefresh = false }) async {
     var _newPosts = await getPosts(pageNum: pageNum);
     setState(() {
-      log(_newPosts[1].toString());
-      _posts.insertAll(_posts.length, _newPosts);
+      if (isRefresh) {
+        _posts = _newPosts;
+      } else {
+        _posts.insertAll(_posts.length, _newPosts);
+      }
 
       if (pageNum == 1 && loading) {
         loading = false;
@@ -52,11 +55,11 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
   }
 
   void _createPost() async {
+    bool _createPostSuccess = false;
     if (_image != null) {
       var body = _postTextController.text;
       try {
-        final response = await uploadMomentImage(File(_image!.path), body);
-        log(response.toString());
+        _createPostSuccess = await uploadMomentImage(File(_image!.path), body);
       } on Exception catch (e) {
         showDialog<String>(
           context: context,
@@ -75,6 +78,10 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
             ],
           )
         );
+      }
+
+      if (_createPostSuccess) {
+        _retrievePosts(1, isRefresh: true);
       }
     }
   }
@@ -186,26 +193,36 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
                               icon: const Icon(Icons.refresh_outlined),
                               tooltip: 'Refresh',
                               onPressed: () {
-                                _retrievePosts(1);
+                                _retrievePosts(1, isRefresh: true);
                               },
                             )
                           ],
                         ),
                       ) :
-                      ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: _posts.length,
-                        itemBuilder: (context, index) {
 
-                          if (index == _posts.length - 1) {
-                            int pageNum = (_posts.length / 20).ceil() + 1;
-                            _retrievePosts(pageNum);
-                          }
+                      RefreshIndicator(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: _posts.length,
+                          itemBuilder: (context, index) {
 
-                          return PostItem(post: _posts[index]);
+                            if (index == _posts.length - 1) {
+                              int pageNum = (_posts.length / 20).ceil() + 1;
+                              _retrievePosts(pageNum);
+                            }
+
+                            return PostItem(post: _posts[index]);
+                          },
+                          separatorBuilder: (context, index) => Divider(height: .0),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                        ),
+
+                        onRefresh:  () async {
+                          await _retrievePosts(1, isRefresh: true);
                         },
-                        separatorBuilder: (context, index) => Divider(height: .0),
+
                       ),
+
                     ),
                   ]),
                 )
@@ -227,10 +244,13 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
                           child: TextField(
                             controller: _postTextController,
                             maxLines: 15,
+                            style: TextStyle(
+                              fontSize: 14.0,
+                            ),
                             decoration: InputDecoration(
                               hintText: 'Type a message',
                               hintStyle: TextStyle(color: Colors.black54),
-                              border: InputBorder.none
+                              border: InputBorder.none,
                             ),
                           ),
                         ),
@@ -259,7 +279,6 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
                           ),
                           backgroundColor: Colors.transparent,
                           onPressed: () {
-                            log('Hi');
                             _createPost();
                           },
                           child: Text(

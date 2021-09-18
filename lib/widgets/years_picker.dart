@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'dart:developer';
-
 class YearsPicker extends StatefulWidget {
   final Function(String) onChange;
   final String? initValue;
