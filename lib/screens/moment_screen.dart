@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:solo_traveller/futures/create_post_future.dart';
 import 'package:solo_traveller/futures/get_posts_future.dart';
 import 'package:solo_traveller/futures/upload_moment_image_future.dart';
 import 'package:solo_traveller/models/post.dart';
@@ -56,33 +57,51 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
 
   void _createPost() async {
     bool _createPostSuccess = false;
-    if (_image != null) {
-      var body = _postTextController.text;
-      try {
-        _createPostSuccess = await uploadMomentImage(File(_image!.path), body);
-      } on Exception catch (e) {
-        showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Failed'),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'Cancel'),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
-          )
-        );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator());
+        }
+    );
+
+
+    var body = _postTextController.text;
+    try {
+      if (_image != null) {
+        _createPostSuccess =
+        await uploadMomentImage(File(_image!.path), body);
+      } else {
+        _createPostSuccess = await createPost(body, null, null, null, null);
       }
 
-      if (_createPostSuccess) {
-        _retrievePosts(1, isRefresh: true);
-      }
+
+    } on Exception catch (e) {
+      showDialog<String>(
+          context: context,
+          builder: (BuildContext context) =>
+              AlertDialog(
+                title: const Text('Failed'),
+                content: Text(e.toString()),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              )
+      );
+    } finally {
+      // Dismiss loading
+      Navigator.pop(context);
+    }
+
+    if (_createPostSuccess) {
+      _retrievePosts(1, isRefresh: true);
     }
   }
 

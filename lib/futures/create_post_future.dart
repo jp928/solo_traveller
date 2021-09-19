@@ -9,9 +9,17 @@ import 'dart:io';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
 
-Future<bool> createPost(String body, int? imageId, String userId, String firstName, String lastName) async {
+Future<bool> createPost(String body, int? imageId, String? userId, String? firstName, String? lastName) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
+
+  var tokenInfo;
+  var fullName;
+  if (firstName == null) {
+    tokenInfo = parseJwt(token!);
+    fullName = tokenInfo?['fullName'].split(' ');
+  }
+
   final response = await http.post(
     Uri.parse('https://solodevelopment.tk/post/posts'),
     headers: <String, String>{
@@ -19,16 +27,15 @@ Future<bool> createPost(String body, int? imageId, String userId, String firstNa
       'Authorization': 'Bearer $token'
     },
     body: jsonEncode(<String, String?>{
-      'ownerUserId': userId,
+      'ownerUserId': userId ?? tokenInfo?['sub'],
       'imageId': imageId == null ? null : imageId.toString(),
       'body': body,
       'postTypeId': 'Post',
-      'firstName': firstName,
-      'lastName': lastName
+      'firstName': firstName ?? fullName[0],
+      'lastName': lastName ?? fullName[1],
     }),
   );
-  log('hi');
-  log(response.statusCode.toString());
+
   if (response.statusCode == 201) {
     return true;
 
