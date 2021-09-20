@@ -8,8 +8,9 @@ class Profile {
   String firstName;
   String dateOfBirth;
   int? chatAccountId;
+  String countryCode;
 
-  Profile(this.firstName, this.dateOfBirth, this.settings, this.chatAccountId);
+  Profile(this.firstName, this.dateOfBirth, this.settings, this.chatAccountId, this.countryCode);
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
   Map<String, dynamic> toJson() => _$ProfileToJson(this);

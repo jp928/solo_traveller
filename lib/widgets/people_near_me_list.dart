@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/futures/get_people_near_me_future.dart';
 import 'package:solo_traveller/models/person.dart';
@@ -42,9 +40,7 @@ class _MomentListState extends State<PeopleNearMeList> {
   }
 
   Future<void> _retrievePeople(int pageNum, { bool isRefresh = false }) async {
-    log(_chosenDistance);
     var _newPeople = await getPeopleNearMe(pageNum: pageNum, distance: _chosenDistance);
-    print(_newPeople);
     setState(() {
       if (isRefresh) {
         _people = _newPeople;
@@ -68,9 +64,11 @@ class _MomentListState extends State<PeopleNearMeList> {
             alignment: Alignment.center,
             child: Column(children: <Widget>[
               Container(
+                width: 150,
                 padding: const EdgeInsets.all(0.0),
                 child: DropdownButton<String>(
                   value: _chosenDistance,
+                  isExpanded: true,
                   elevation: 5,
                   style: TextStyle(color: Colors.black),
 
@@ -88,7 +86,7 @@ class _MomentListState extends State<PeopleNearMeList> {
                     );
                   }).toList(),
                   hint: Text(
-                    "Please choose a distance from you",
+                    'Please choose a distance from you',
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,

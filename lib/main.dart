@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solo_traveller/providers/my_cube_session.dart';
@@ -40,7 +41,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SoloTraveller',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -58,6 +59,13 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             cursorColor:  Color.fromRGBO(79, 152, 248, 1)
         ),
       ),
+
+      supportedLocales: [
+        Locale('en'),
+      ],
+      localizationsDelegates: [
+        CountryLocalizations.delegate,
+      ],
       home: MyHomePage(title: 'Flutter Demo Home Page!'),
     );
   }
@@ -106,7 +114,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    log("Current app state: $state");
     appState = state;
 
     if (AppLifecycleState.paused == state) {
@@ -116,8 +123,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     } else if (AppLifecycleState.resumed == state) {
       CubeUser? user = context.read<MyCubeUser>().user;
 
-      log('=======>>>>');
-      print(user);
       if (user != null && !CubeChatConnection.instance.isAuthenticated()) {
         CubeChatConnection.instance.login(user);
       }

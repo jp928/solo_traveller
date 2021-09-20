@@ -1,38 +1,37 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
-import 'package:solo_traveller/models/profile.dart';
 
-Future<bool> updateProfile(Profile profile) async {
+Future<bool> saveInterest(List<int> interests) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
-  final response = await http.put(
-    Uri.parse('https://solodevelopment.tk/account/update_profile'),
+  final response = await http.post(
+    Uri.parse('https://solodevelopment.tk/user/save_interests'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     },
-    body: jsonEncode(profile),
+    body: jsonEncode(<String, List<int>>{
+      'interestIds': interests,
+    }),
   );
-  log(jsonEncode(profile));
-  if (response.statusCode == 200) {
-    log('=========>>>>>>>');
-    log(response.body);
-    return true;
-  } else {
-    var message = 'Failed';
 
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return true;
+
+  } else {
     if (response.statusCode == 401) {
       await refreshToken();
-      return updateProfile(profile);
+      return saveInterest(interests);
     }
 
+    var message = 'Failed';
     if (response.body.isNotEmpty) {
       Map<String, dynamic> data = jsonDecode(response.body);
       message = data['message'] ?? 'Failed';
     }
+
     // If the server did not return a 201 CREATED response,
     // then throw an exception.
     throw Exception(message);

@@ -1,19 +1,40 @@
-import 'dart:developer';
-
+import 'package:connectycube_sdk/connectycube_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
+import 'package:solo_traveller/screens/get_start_screen.dart';
+import 'package:solo_traveller/screens/login_screen.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({
     Key? key,
   }) : super(key: key);
 
+  void _logout(BuildContext context) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    await secureStorage.deleteAll();
+
+    MyCubeUser cubeUser = context.read<MyCubeUser>();
+    cubeUser.setEmail('');
+    cubeUser.setName('');
+    cubeUser.setProfileImage('');
+
+    await signOut();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => GetStartScreen(),
+      ),
+          (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var user = context.watch<MyCubeUser>();
-    log(user.email ?? '');
     return Drawer(
       child: MediaQuery.removePadding(
         context: context,
@@ -78,12 +99,12 @@ class MyDrawer extends StatelessWidget {
               child: ListView(
                 children: <Widget>[
                   ListTile(
-                    leading: const Icon(Icons.add),
-                    title: const Text('Add account'),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.settings),
-                    title: const Text('Manage accounts'),
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Logout'),
+                    onTap: (){
+                      _logout(context);
+
+                    },
                   ),
                 ],
               ),

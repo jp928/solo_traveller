@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:connectycube_sdk/connectycube_calls.dart';
-import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
@@ -16,7 +16,6 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'one_more_step_screen.dart';
 
-
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({Key? key}) : super(key: key);
 
@@ -25,7 +24,6 @@ class CreateProfileScreen extends StatefulWidget {
 }
 
 class _CreateProfileScreenState extends State<CreateProfileScreen> {
-  // String selectedYear = 'Year of birth';
   DateTime? selectedDate;
 
   final TextEditingController _firstNameController = TextEditingController();
@@ -34,6 +32,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
+
+  Country? _country;
 
   _imgFromCamera() async {
     XFile? image = await _picker.pickImage(
@@ -67,6 +67,23 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       return;
     }
 
+    if (_country == null) {
+      showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('No country selected'),
+            content: Text('Please select a country you are from.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          ));
+
+      return;
+    }
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -78,8 +95,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     try {
       MyCubeUser user = context.read<MyCubeUser>();
       user.setName(_firstNameController.text);
-      CubeUser? _cubeUser =  await createConnectyCubeSession(context);
-
+      CubeUser? _cUser = user.user;
+      if (_cUser == null) {
+        _cUser =  await createConnectyCubeSession(context);
+      }
+      //
       Profile profile = Profile(
         _firstNameController.text,
         DateFormat('yyyy-MM-dd').format(selectedDate!),
@@ -87,7 +107,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           _currentRangeValues.start.toInt(),
           _currentRangeValues.end.toInt(),
         ),
-        _cubeUser?.id
+        _cUser!.id,
+        _country!.countryCode
       );
       result = await updateProfile(profile);
     } on Exception catch (e) {
@@ -300,78 +321,94 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                             return null;
                                           },
                                         ),
-                                        CountryCodePicker(
-                                          onChanged: print,
-                                          // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                                          initialSelection: 'AU',
-                                          // favorite: ['+39','FR'],
-                                          // optional. Shows only country name and flag
-                                          showCountryOnly: true,
-                                          // optional. Shows only country name and flag when popup is closed.
-                                          showOnlyCountryWhenClosed: true,
-                                          // optional. aligns the flag and the Text left
-                                          alignLeft: true,
-                                          showFlag: false,
-                                          showFlagDialog: true,
-                                          textStyle: TextStyle(
-                                              fontSize: 16,
-                                              color: Color.fromRGBO(
-                                                  170, 175, 190, 1)),
-                                          builder: (countryCode) =>
-                                              Container(
-                                                  height: 56,
-                                                  width: double.infinity,
-                                                  alignment: Alignment.centerLeft,
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                  decoration:
-                                                      BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(
-                                                            width: 1.6,
-                                                            color: Color.fromRGBO(218, 218, 236, 1),
-                                                          )
-                                                      ),
-                                                  child: countryCode == null
-                                                      ? Text('Country you\'re from')
-                                                      : Text(countryCode.name.toString())
-                                              ),
-                                        ),
-                                        Container(
-                                            height: 56,
-                                            width: double.infinity,
-                                            padding: const EdgeInsets
-                                                .symmetric(horizontal: 2),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        6),
-                                                border: Border.all(
-                                                  width: 1.6,
-                                                  color: Color.fromRGBO(
-                                                      218, 218, 236, 1),
-                                                )),
-                                            child: TextButton(
-                                                child: Container(
-                                                  child: Row(
-                                                    children: [
-                                                      Container(
-                                                        child: Text(
-                                                          selectedDate == null ? 'Year of birth' : DateFormat('yyyy-MM-dd').format(selectedDate!),
-                                                          style: TextStyle(
-                                                              // textBaseline: TextBaseline.alphabetic,
-                                                              color: placeholderGrey,
-                                                              fontFamily:'Roboto',
-                                                              fontWeight: FontWeight.w400,
-                                                              fontSize: 16
-                                                          ),
-                                                        )
-                                                      )
-                                                    ],
+                                        GestureDetector(
+                                          onTap: () {
+                                            showCountryPicker(
+                                              context: context,
+                                              //Optional.  Can be used to exclude(remove) one ore more country from the countries list (optional).
+                                              exclude: <String>['KN', 'MF'],
+                                              //Optional. Shows phone code before the country name.
+                                              showPhoneCode: false,
+                                              onSelect: (Country country) {
+                                                setState(() {
+                                                  _country = country;
+                                                });
+                                              },
+                                              // Optional. Sets the theme for the country list picker.
+                                              countryListTheme: CountryListThemeData(
+                                                // Optional. Sets the border radius for the bottomsheet.
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(40.0),
+                                                  topRight: Radius.circular(40.0),
+                                                ),
+                                                // Optional. Styles the search field.
+                                                inputDecoration: InputDecoration(
+                                                  labelText: 'Search',
+                                                  hintText: 'Start typing to search',
+                                                  prefixIcon: const Icon(Icons.search),
+                                                  border: OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: const Color(0xFF8C98A8).withOpacity(0.2),
+                                                    ),
                                                   ),
                                                 ),
-                                                onPressed: () {
-                                                  _showDatePicker(context);
-                                                })),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                              height: 56,
+                                              width: double.infinity,
+                                              alignment: Alignment.centerLeft,
+                                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                                              decoration:
+                                                  BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(6),
+                                                      border: Border.all(
+                                                        width: 1.6,
+                                                        color: Color.fromRGBO(218, 218, 236, 1),
+                                                      )
+                                                  ),
+                                              child: Text(_country == null ? 'Country you\'re from' : _country!.displayNameNoCountryCode)
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 56,
+                                          width: double.infinity,
+                                          padding: const EdgeInsets
+                                              .symmetric(horizontal: 2),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      6),
+                                              border: Border.all(
+                                                width: 1.6,
+                                                color: Color.fromRGBO(
+                                                    218, 218, 236, 1),
+                                              )),
+                                          child: TextButton(
+                                            child: Container(
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    child: Text(
+                                                      selectedDate == null ? 'Year of birth' : DateFormat('yyyy-MM-dd').format(selectedDate!),
+                                                      style: TextStyle(
+                                                          // textBaseline: TextBaseline.alphabetic,
+                                                          color: placeholderGrey,
+                                                          fontFamily:'Roboto',
+                                                          fontWeight: FontWeight.w400,
+                                                          fontSize: 16
+                                                      ),
+                                                    )
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              _showDatePicker(context);
+                                            }
+                                          )
+                                        ),
                                         Container(
                                           height: 96,
                                           width: double.infinity,

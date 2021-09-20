@@ -11,6 +11,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['dateOfBirth'] as String,
       Settings.fromJson(json['settings'] as Map<String, dynamic>),
       json['chatAccountId'] as int?,
+      json['countryCode'] as String,
     );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'firstName': instance.firstName,
       'dateOfBirth': instance.dateOfBirth,
       'chatAccountId': instance.chatAccountId,
+      'countryCode': instance.countryCode,
     };
