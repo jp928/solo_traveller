@@ -1,0 +1,184 @@
+fastlane_version "2.178.0"
+
+default_platform :android
+
+platform :android do
+
+  desc "Upload a new Android adhoc Build to Apple App Connect"
+  lane :adhoc do
+    versionCode = Time.now.strftime("%Y%m%d%H")
+    gradle(task: "clean", project_dir: "android/")
+    android_set_version_code(
+      version_code: versionCode,
+      gradle_file: "android/app/build.gradle"
+    )
+    gradle(
+      task: "assembleRelease",
+      project_dir: "android/",
+      system_properties: {
+        "ENVFILE": ".env.prod"
+      }
+    )
+    aws_s3(
+      access_key: ENV["AWS_ACCESS_KEY"],
+      secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
+      bucket: "botanikai-app-binary",
+      region: "ap-southeast-2",
+      apk: "/home/circleci/project/android/app/build/outputs/apk/release/app-release.apk",
+      app_directory: "android"
+    )
+  end
+
+
+  desc "Submit a new android Beta Build to Google Play Store"
+  lane :beta do
+    versionCode = Time.now.strftime("%Y%m%d%H")
+    versionName = android_get_version_name(gradle_file: "android/app/build.gradle") || "1.0"
+    gradle(task: "clean", project_dir: "android/")
+    android_set_version_code(
+      version_code: versionCode,
+      gradle_file: "android/app/build.gradle"
+    )
+    gradle(
+      task: "assembleRelease",
+      project_dir: "android/",
+      system_properties: {
+        "ENVFILE": ".env.prod"
+      }
+    )
+    upload_to_play_store(
+      track: "beta",
+      version_code: versionCode,
+      version_name: versionName,
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+
+  desc "Deploy a new version to the Google Play"
+  lane :release do
+    versionCode = Time.now.strftime("%Y%m%d%H")
+    versionName = android_get_version_name(gradle_file: "android/app/build.gradle") || "1.0"
+    gradle(task: "clean", project_dir: "android/")
+    android_set_version_code(
+      version_code: versionCode,
+      gradle_file: "android/app/build.gradle"
+    )
+    gradle(
+      task: "assembleRelease",
+      project_dir: "android/",
+      system_properties: {
+        "ENVFILE": ".env.prod"
+      }
+    )
+    upload_to_play_store(
+      track: "alpha",
+      version_code: versionCode,
+      version_name: versionName,
+      track_promote_to: "production",
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+end
+
+platform :ios do
+  before_all do
+    setup_circle_ci
+  end
+
+  desc "Upload a new ios adhoc Build to Apple App Connect"
+  lane :adhoc do
+    # xcode_select "/Applications/Xcode-12.4.app"
+    xcode_select "/Applications/Xcode.app"
+    match(
+      git_basic_authorization: 'anA5Mjg6Z2hwX0VISW1aQ1BYOFFOeXVHQUNBN1pvN1E2OE0zNHBZZTN3dVZJOQ==',
+      type: "appstore",
+      readonly: true
+    )
+    get_provisioning_profile(
+      adhoc: true,
+      force: true,
+      api_key: api_key
+    )
+    gym(
+      clean: true,
+      scheme: "botanikai",
+      workspace: "./ios/botanikai.xcworkspace",
+      export_method: "ad-hoc",
+      export_xcargs: "-allowProvisioningUpdates",
+      export_options: {
+        provisioningProfiles: {
+            "com.solotravellerapp" => "com.solotravellerapp AdHoc"
+        }
+      }
+    )
+    aws_s3(
+      access_key: ENV["AWS_ACCESS_KEY"],
+      secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
+      bucket: "botanikai-app-binary",
+      region: "ap-southeast-2",
+      ipa: "/Users/distiller/project/output/gym/botanikai.ipa",
+      app_directory: "ios"
+    )
+  end
+
+
+  desc "Upload a new ios Beta Build to Apple App Connect"
+  lane :beta do
+    increment_build_number(
+      build_number: Time.now.strftime("%Y%m%d%H%M"),
+      xcodeproj: "./ios/Runner.xcodeproj"
+    )
+    match(
+      git_basic_authorization: 'anA5Mjg6Z2hwX0VISW1aQ1BYOFFOeXVHQUNBN1pvN1E2OE0zNHBZZTN3dVZJOQ==',
+      app_identifier: "com.ionicframework.solotravellerapp837435",
+      type: "appstore",
+      readonly: false
+    )
+    Dir.chdir "../.." do
+        sh("flutter", "packages", "get")
+        sh("flutter", "clean")
+        sh("flutter", "build", "ios", "--release", "--no-codesign")
+    end
+    build_ios_app(scheme: "Runner")
+    upload_to_testflight
+  end
+
+
+  desc "Push a new release build to the App Store"
+  lane :release do
+    xcode_select "/Applications/Xcode.app"
+    increment_build_number(
+      build_number: Time.now.strftime("%Y%m%d%H%M"),
+      xcodeproj: "./ios/botanikai.xcodeproj"
+    )
+    match(
+      git_basic_authorization: 'anA5Mjg6Z2hwX0VISW1aQ1BYOFFOeXVHQUNBN1pvN1E2OE0zNHBZZTN3dVZJOQ==',
+      type: "appstore",
+      readonly: true
+    )
+    gym(
+      clean: true,
+      scheme: "botanikai",
+      workspace: "./ios/botanikai.xcworkspace",
+    )
+    api_key = app_store_connect_api_key(
+      key_id: "WCHATU6TL7",
+      issuer_id: "8cb89bf1-1820-4df6-858a-3899b7533ddd",
+      key_filepath: "./fastlane/AuthKey_WCHATU6TL7.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false, # optional but may be required if using match/sigh
+    )
+    upload_to_testflight(
+      api_key: api_key
+    )
+  end
+
+end
