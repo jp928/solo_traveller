@@ -32,6 +32,8 @@ PODS:
     - Flutter
     - GoogleWebRTC (= 1.1.31999)
     - Libyuv (= 1703)
+  - geolocator_apple (1.2.0):
+    - Flutter
   - GoogleWebRTC (1.1.31999)
   - image_picker (0.0.1):
     - Flutter
@@ -49,6 +51,7 @@ DEPENDENCIES:
   - flutter_facebook_auth (from `.symlinks/plugins/flutter_facebook_auth/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - platform_device_id (from `.symlinks/plugins/platform_device_id/ios`)
@@ -76,6 +79,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
   flutter_webrtc:
     :path: ".symlinks/plugins/flutter_webrtc/ios"
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   path_provider:
@@ -94,6 +99,7 @@ SPEC CHECKSUMS:
   flutter_facebook_auth: 528d51ea1324741b366fa87fa5dfd41016422364
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   flutter_webrtc: 39898454258b54ba51996850d5da8d5d53bf1524
+  geolocator_apple: b741765c55dc21950e3e106e8b3584e55cf81ce5
   GoogleWebRTC: b39a78c4f5cc6b0323415b9233db03a2faa7b0f0
   image_picker: 9aa50e1d8cdacdbed739e925b7eea16d014367e6
   Libyuv: 5f79ced0ee66e60a612ca97de1e6ccacd187a437
