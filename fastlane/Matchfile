@@ -2,7 +2,7 @@ git_url("https://github.com/jp928/solotraveller-ios-certificates.git")
 git_basic_authorization("anA5Mjg6Z2hwX0VISW1aQ1BYOFFOeXVHQUNBN1pvN1E2OE0zNHBZZTN3dVZJOQ==")
 storage_mode("git")
 
-app_identifier(["com.solotravellerapp"])
+app_identifier(["com.ionicframework.solotravellerapp837435"])
 team_id("W6V4MZ52HF")
 username("piaojingtai@gmail.com") # Your Apple Developer Portal username
 
