@@ -1,14 +1,14 @@
 git_url("https://github.com/jp928/solotraveller-ios-certificates.git")
-
+git_basic_authorization("anA5Mjg6Z2hwX0VISW1aQ1BYOFFOeXVHQUNBN1pvN1E2OE0zNHBZZTN3dVZJOQ==")
 storage_mode("git")
 
-app_identifier(["com.ionicframework.solotravellerapp837435"])
+app_identifier(["com.solotravellerapp"])
 team_id("W6V4MZ52HF")
 username("piaojingtai@gmail.com") # Your Apple Developer Portal username
 
-readonly false
-clone_branch_directly false
-generate_apple_certs true
+readonly true
+clone_branch_directly true
+generate_apple_certs false
 # For all available options run `fastlane match --help`
 # Remove the # in the beginning of the line to enable the other options
 

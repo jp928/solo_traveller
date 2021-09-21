@@ -132,22 +132,18 @@ platform :ios do
 
   desc "Upload a new ios Beta Build to Apple App Connect"
   lane :beta do
-    increment_build_number(
-      build_number: Time.now.strftime("%Y%m%d%H%M"),
-      xcodeproj: "./ios/Runner.xcodeproj"
-    )
     match(
       git_basic_authorization: 'anA5Mjg6Z2hwX0VISW1aQ1BYOFFOeXVHQUNBN1pvN1E2OE0zNHBZZTN3dVZJOQ==',
-      app_identifier: "com.ionicframework.solotravellerapp837435",
+      app_identifier: "com.solotravellerapp",
       type: "appstore",
-      readonly: false
+      readonly: true
     )
     Dir.chdir "../" do
         sh("flutter", "packages", "get")
         sh("flutter", "clean")
         sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
-    build_ios_app(scheme: "Runner")
+    build_ios_app(scheme: "Runner", workspace: "./ios/Runner.xcworkspace")
     upload_to_testflight
   end
 
