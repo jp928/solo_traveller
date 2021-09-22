@@ -28,7 +28,7 @@ class PhotoHero extends StatelessWidget {
             child: this.photo == null
                 ? Icon(
                     Icons.camera_alt_outlined,
-                    size: 48,
+                    size: width / 2,
                     color: Colors.grey[600],
                   )
                 : ClipRRect(

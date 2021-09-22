@@ -12,7 +12,6 @@ class _MomentScreenState extends State<MomentScreen> with SingleTickerProviderSt
   late TabController _tabController;
   List tabs = ['#ALL MOMENTS', '#ALL PEOPLE'];
 
-
   @override
   void initState() {
     super.initState();

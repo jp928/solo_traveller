@@ -103,12 +103,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       Profile profile = Profile(
         _firstNameController.text,
         DateFormat('yyyy-MM-dd').format(selectedDate!),
+        _country!.countryCode,
         Settings(
           _currentRangeValues.start.toInt(),
           _currentRangeValues.end.toInt(),
         ),
         _cUser!.id,
-        _country!.countryCode
       );
       result = await updateProfile(profile);
     } on Exception catch (e) {

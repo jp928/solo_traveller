@@ -57,7 +57,6 @@ class _MomentListState extends State<MomentList> {
         }
     );
 
-
     var body = _postTextController.text;
     try {
       if (_image != null) {

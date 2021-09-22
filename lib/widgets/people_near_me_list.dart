@@ -164,18 +164,18 @@ class _MomentListState extends State<PeopleNearMeList> {
                                           decoration: BoxDecoration(
                                               color: Colors.grey[200],
                                               borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          width: 96,
-                                          height: 96,
+                                                  BorderRadius.circular(60)),
+                                          width: 120,
+                                          height: 120,
                                           child: PhotoHero(
                                             photo: person.profileImage,
                                             id: person.id.toString(),
-                                            width: 96,
+                                            width: 120,
                                             onTap: () {
                                               Navigator.of(context).push(
                                                   new MaterialPageRoute(
                                                     builder: (context) =>
-                                                    new PeopleProfileScreen(),
+                                                    new PeopleProfileScreen(userId: person.id),
 
                                                     settings: RouteSettings(
                                                       arguments: person,
