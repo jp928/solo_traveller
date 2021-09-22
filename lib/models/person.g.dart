@@ -12,6 +12,7 @@ Person _$PersonFromJson(Map<String, dynamic> json) => Person(
       json['email'] as String,
       json['profileImage'] as String?,
       json['status'] as String,
+      json['id'] as int,
     );
 
 Map<String, dynamic> _$PersonToJson(Person instance) => <String, dynamic>{
@@ -20,4 +21,5 @@ Map<String, dynamic> _$PersonToJson(Person instance) => <String, dynamic>{
       'email': instance.email,
       'profileImage': instance.profileImage,
       'status': instance.status,
+      'id': instance.id,
     };

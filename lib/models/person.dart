@@ -9,8 +9,9 @@ class Person {
   String email;
   String? profileImage;
   String status;
+  int id;
 
-  Person(this.firstName, this.lastName, this.email, this.profileImage, this.status);
+  Person(this.firstName, this.lastName, this.email, this.profileImage, this.status, this.id);
 
   factory Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
   Map<String, dynamic> toJson() => _$PersonToJson(this);

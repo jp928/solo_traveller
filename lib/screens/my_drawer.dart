@@ -5,7 +5,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
-import 'package:solo_traveller/screens/login_screen.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({
