@@ -69,6 +69,29 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
           style: TextStyle(color: Colors.black54),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (_profile?.chatAccountId == null) {
+            showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Failed'),
+                  content: Text('Can\'t chat with this user.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                )
+            );
+          }
+          // Add your onPressed code here!
+        },
+        // label: const Text('Approve'),
+        child: const Icon(Icons.chat),
+        backgroundColor: Color(0xff718CFB),
+      ),
       body: Container(
         // Set background to blue to emphasize that it's a new route.
         // color: Colors.lightBlueAccent,
@@ -150,12 +173,14 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        height: 36,
+                        height: 40,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text((_profile?.momentCount ?? 0).toString()),
+                            Text((_profile?.momentCount ?? 0).toString(),
+                                style: TextStyle(
+                                    color: Color(0xff718CFB), fontSize: 16)),
                             Text('MOMENTS',
                                 style: GoogleFonts.getFont('Source Sans Pro',
                                     color: Color(0xff4A4A4A)))
@@ -163,30 +188,79 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                         ),
                       ),
                       Container(
-                          height: 36,
+                          height: 40,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((_profile?.followerCount ?? 0).toString()),
+                              Text((_profile?.followerCount ?? 0).toString(),
+                                  style: TextStyle(
+                                      color: Color(0xff718CFB), fontSize: 16)),
                               Text('FOLLOWERS',
                                   style: GoogleFonts.getFont('Source Sans Pro',
                                       color: Color(0xff4A4A4A)))
                             ],
                           )),
                       Container(
-                          height: 36,
+                          height: 40,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((_profile?.followingCount ?? 0).toString()),
+                              Text((_profile?.followingCount ?? 0).toString(),
+                                  style: TextStyle(
+                                      color: Color(0xff718CFB), fontSize: 16)),
                               Text('FOLLOWING',
                                   style: GoogleFonts.getFont('Source Sans Pro',
                                       color: Color(0xff4A4A4A)))
                             ],
-                          ))
+                          )
+                      ),
                     ],
+                  )
+                ],
+              ),
+            ),
+            Divider(
+              height: 0,
+              thickness: 1,
+              indent: 0,
+              endIndent: 0,
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Mutual interests',
+                    style: TextStyle(fontSize: 10),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 12),
+                  ),
+                Wrap(
+                    spacing: 8.0, // gap between adjacent chips
+                    runSpacing: 4.0, // gap between lines
+                    children: (_profile?.interests ?? []).map((interest) {
+                      return Container(
+                          height: 40,
+                          width: 108,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Color(0xff718CFB),
+                                radius: 16,
+                              ),
+                              Text(interest!,
+                                  style: TextStyle(
+                                      color: Color(0xff2E2F41), fontSize: 12)),
+                            ],
+                          )
+                      );
+                    }).toList()
                   )
                 ],
               ),

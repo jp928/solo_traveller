@@ -15,12 +15,14 @@ class MomentList extends StatefulWidget {
 
 class _MomentListState extends State<MomentList> {
   final TextEditingController _postTextController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
 
   var _posts = <Post>[];
   bool loading = false;
+  bool loadingMore = false;
 
   @override
   void initState() {
@@ -28,6 +30,19 @@ class _MomentListState extends State<MomentList> {
     setState(() {
       loading = true;
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent && !loading && !loadingMore) {
+          setState(() {
+            loadingMore = true;
+          });
+          log(_posts.length.toString());
+          log('loading more...');
+          int pageNum = (_posts.length / 20).ceil() + 1;
+          _retrievePosts(pageNum);
+      }
+    });
+
     // Retrieve first
     _retrievePosts(1, isRefresh: true);
   }
@@ -43,6 +58,10 @@ class _MomentListState extends State<MomentList> {
 
       if (pageNum == 1 && loading) {
         loading = false;
+      }
+
+      if (loadingMore == true) {
+        loadingMore = false;
       }
     });
   }
@@ -154,6 +173,12 @@ class _MomentListState extends State<MomentList> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
@@ -184,15 +209,10 @@ class _MomentListState extends State<MomentList> {
 
                   RefreshIndicator(
                     child: ListView.separated(
+                      controller: _scrollController,
                       shrinkWrap: true,
                       itemCount: _posts.length,
                       itemBuilder: (context, index) {
-
-                        if (index == _posts.length - 1) {
-                          int pageNum = (_posts.length / 20).ceil() + 1;
-                          _retrievePosts(pageNum);
-                        }
-
                         return PostItem(post: _posts[index]);
                       },
                       separatorBuilder: (context, index) => Divider(height: .0),
