@@ -209,6 +209,7 @@ class _MomentListState extends State<MomentList> {
 
                   RefreshIndicator(
                     child: ListView.separated(
+                      physics: ClampingScrollPhysics(),
                       controller: _scrollController,
                       shrinkWrap: true,
                       itemCount: _posts.length,
@@ -216,7 +217,6 @@ class _MomentListState extends State<MomentList> {
                         return PostItem(post: _posts[index]);
                       },
                       separatorBuilder: (context, index) => Divider(height: .0),
-                      physics: const AlwaysScrollableScrollPhysics(),
                     ),
 
                     onRefresh:  () async {

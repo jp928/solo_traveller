@@ -19,6 +19,7 @@ class MyDrawer extends StatelessWidget {
     cubeUser.setEmail('');
     cubeUser.setName('');
     cubeUser.setProfileImage('');
+    cubeUser.setUser(null);
 
     await signOut();
 
@@ -34,6 +35,7 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<MyCubeUser>();
+    print(user.user);
     return Drawer(
       child: MediaQuery.removePadding(
         context: context,
@@ -61,11 +63,20 @@ class MyDrawer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(50)),
                       width: 64,
                       height: 64,
-                      child: Icon(
+                      child: user.profileImage == null ? Icon(
                         Icons.camera_alt_outlined,
                         size: 32,
                         color: Colors.grey[600],
-                      ),
+                      ) :
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(32),
+                          child: Image.network(
+                            user.profileImage!,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover
+                          ),
+                        ),
                     )
                   ),
                   Column(
@@ -97,6 +108,14 @@ class MyDrawer extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.people),
+                    title: const Text('My profile'),
+                    onTap: (){
+                      _logout(context);
+
+                    },
+                  ),
                   ListTile(
                     leading: const Icon(Icons.logout),
                     title: const Text('Logout'),

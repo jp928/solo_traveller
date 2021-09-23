@@ -16,7 +16,7 @@ Future<bool> updateProfile(Profile profile) async {
     },
     body: jsonEncode(profile),
   );
-  log(jsonEncode(profile));
+
   if (response.statusCode == 200) {
     log('=========>>>>>>>');
     log(response.body);

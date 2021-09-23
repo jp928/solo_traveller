@@ -21,7 +21,7 @@ class MyCubeUser with ChangeNotifier, DiagnosticableTreeMixin {
     this._name = name;
   }
 
-  void setUser(CubeUser user) {
+  void setUser(CubeUser? user) {
     this._user = user;
   }
 

@@ -7,6 +7,7 @@ import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/constants/colors.dart';
 import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
 import 'package:solo_traveller/futures/update_profile_future.dart';
+import 'package:solo_traveller/futures/upload_profile_image_future.dart';
 import 'package:solo_traveller/models/profile.dart';
 import 'package:solo_traveller/models/settings.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
@@ -99,7 +100,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       if (_cUser == null) {
         _cUser =  await createConnectyCubeSession(context);
       }
-      //
+      log('1');
+      if (_image != null) {
+        await uploadProfileImage(File(_image!.path), context);
+      }
+      log('2');
       Profile profile = Profile(
         _firstNameController.text,
         DateFormat('yyyy-MM-dd').format(selectedDate!),
@@ -111,6 +116,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         _cUser!.id,
       );
       result = await updateProfile(profile);
+      log('3');
     } on Exception catch (e) {
       Navigator.pop(context);
       showDialog<String>(
