@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +23,8 @@ class _MomentListState extends State<MomentList> {
   bool loading = false;
   bool loadingMore = false;
 
+  double _offset = 0;
+
   @override
   void initState() {
     super.initState();
@@ -32,14 +33,16 @@ class _MomentListState extends State<MomentList> {
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent && !loading && !loadingMore) {
-          setState(() {
-            loadingMore = true;
-          });
-          log(_posts.length.toString());
-          log('loading more...');
-          int pageNum = (_posts.length / 20).ceil() + 1;
-          _retrievePosts(pageNum);
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent &&
+          !loading &&
+          !loadingMore) {
+        setState(() {
+          loadingMore = true;
+        });
+
+        int pageNum = (_posts.length / 20).ceil() + 1;
+        _retrievePosts(pageNum);
       }
     });
 
@@ -47,7 +50,7 @@ class _MomentListState extends State<MomentList> {
     _retrievePosts(1, isRefresh: true);
   }
 
-  Future<void> _retrievePosts(int pageNum, { bool isRefresh = false }) async {
+  Future<void> _retrievePosts(int pageNum, {bool isRefresh = false}) async {
     var _newPosts = await getPosts(pageNum: pageNum);
     setState(() {
       if (isRefresh) {
@@ -73,24 +76,19 @@ class _MomentListState extends State<MomentList> {
         context: context,
         builder: (BuildContext context) {
           return Center(child: CircularProgressIndicator());
-        }
-    );
+        });
 
     var body = _postTextController.text;
     try {
       if (_image != null) {
-        _createPostSuccess =
-        await uploadMomentImage(File(_image!.path), body);
+        _createPostSuccess = await uploadMomentImage(File(_image!.path), body);
       } else {
         _createPostSuccess = await createPost(body, null, null, null, null);
       }
-
-
     } on Exception catch (e) {
       showDialog<String>(
           context: context,
-          builder: (BuildContext context) =>
-              AlertDialog(
+          builder: (BuildContext context) => AlertDialog(
                 title: const Text('Failed'),
                 content: Text(e.toString()),
                 actions: <Widget>[
@@ -103,8 +101,7 @@ class _MomentListState extends State<MomentList> {
                     child: const Text('OK'),
                   ),
                 ],
-              )
-      );
+              ));
     } finally {
       // Dismiss loading
       Navigator.pop(context);
@@ -139,9 +136,11 @@ class _MomentListState extends State<MomentList> {
     setState(() {
       _image = image!;
     });
+
+    Navigator.of(context).pop();
   }
 
-  void _showImagePicker (context) {
+  void _showImagePicker(context) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
@@ -154,7 +153,6 @@ class _MomentListState extends State<MomentList> {
                       title: new Text('Photo Library'),
                       onTap: () {
                         _imgFromGallery();
-                        Navigator.of(context).pop();
                       }),
                   new ListTile(
                     leading: new Icon(Icons.photo_camera),
@@ -168,8 +166,7 @@ class _MomentListState extends State<MomentList> {
               ),
             ),
           );
-        }
-    );
+        });
   }
 
   @override
@@ -188,60 +185,71 @@ class _MomentListState extends State<MomentList> {
               alignment: Alignment.center,
               child: Column(children: <Widget>[
                 Expanded(
-                  child: _posts.length == 0 ?
-                  Center(
-                    child: Column(
-                      children: [
-                        Padding(padding: EdgeInsets.only(top: 32)),
-                        loading ?
-                        new CircularProgressIndicator()
-                            :
-                        IconButton(
-                          icon: const Icon(Icons.refresh_outlined),
-                          tooltip: 'Refresh',
-                          onPressed: () {
-                            _retrievePosts(1, isRefresh: true);
-                          },
+                  child: _posts.length == 0
+                      ? Center(
+                          child: Column(
+                            children: [
+                              Padding(padding: EdgeInsets.only(top: 32)),
+                              loading
+                                  ? new CircularProgressIndicator()
+                                  : IconButton(
+                                      icon: const Icon(Icons.refresh_outlined),
+                                      tooltip: 'Refresh',
+                                      onPressed: () {
+                                        _retrievePosts(1, isRefresh: true);
+                                      },
+                                    )
+                            ],
+                          ),
                         )
-                      ],
-                    ),
-                  ) :
+                      : new NotificationListener(
+                          child: RefreshIndicator(
+                            child: ListView.separated(
+                              key: PageStorageKey('post'),
+                              physics: ClampingScrollPhysics(),
+                              controller: _scrollController,
+                              shrinkWrap: true,
+                              itemCount: _posts.length,
+                              itemBuilder: (context, index) {
+                                if (_offset > 0 && loadingMore == true) {
+                                  _scrollController.jumpTo(_offset);
+                                }
+                                return PostItem(post: _posts[index]);
+                              },
+                              separatorBuilder: (context, index) =>
+                                  Divider(height: .0),
+                            ),
+                            onRefresh: () async {
+                              await _retrievePosts(1, isRefresh: true);
+                            },
+                          ),
+                          onNotification: (t) {
+                            if (t is ScrollEndNotification) {
+                              _offset = _scrollController.position.pixels;
+                              print(_scrollController.position.pixels);
+                            }
 
-                  RefreshIndicator(
-                    child: ListView.separated(
-                      physics: ClampingScrollPhysics(),
-                      controller: _scrollController,
-                      shrinkWrap: true,
-                      itemCount: _posts.length,
-                      itemBuilder: (context, index) {
-                        return PostItem(post: _posts[index]);
-                      },
-                      separatorBuilder: (context, index) => Divider(height: .0),
-                    ),
-
-                    onRefresh:  () async {
-                      await _retrievePosts(1, isRefresh: true);
-                    },
-
-                  ),
-
+                            return true;
+                          },
+                        ),
                 ),
               ]),
-            )
-        ),
-
+            )),
         Align(
             alignment: Alignment.bottomLeft,
             child: SafeArea(
               top: false,
               child: Container(
-                padding: EdgeInsets.only(left: 10,bottom: 10,top: 10,right: 10),
+                padding:
+                    EdgeInsets.only(left: 10, bottom: 10, top: 10, right: 10),
                 height: 60,
                 width: double.infinity,
                 color: Color(0xffF4F4F4),
                 child: Row(
                   children: <Widget>[
-                    SizedBox(width: 8,),
+                    SizedBox(
+                      width: 8,
+                    ),
                     Expanded(
                       child: TextField(
                         controller: _postTextController,
@@ -256,7 +264,9 @@ class _MomentListState extends State<MomentList> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 8,),
+                    SizedBox(
+                      width: 8,
+                    ),
                     Ink(
                       decoration: const ShapeDecoration(
                         color: Colors.lightBlue,
@@ -270,15 +280,13 @@ class _MomentListState extends State<MomentList> {
                         },
                       ),
                     ),
-                    SizedBox(width: 8,),
+                    SizedBox(
+                      width: 8,
+                    ),
                     FloatingActionButton(
                       shape: BeveledRectangleBorder(
                           borderRadius: BorderRadius.zero,
-                          side: BorderSide(
-                              color: Colors.grey,
-                              width: 1
-                          )
-                      ),
+                          side: BorderSide(color: Colors.grey, width: 1)),
                       backgroundColor: Colors.transparent,
                       onPressed: () {
                         _createPost();
@@ -287,23 +295,12 @@ class _MomentListState extends State<MomentList> {
                         'Send',
                         style: TextStyle(color: Colors.grey),
                       ),
-                      // child: TextButton(
-                      //   child: Text('Send'),
-                      //   style: TextButton.styleFrom(
-                      //     primary: Colors.grey,
-                      //     // backgroundColor: Colors.teal,
-                      //     onSurface: Colors.grey,
-                      //   ),
-                      //
-                      // ),
-                      // backgroundColor: Colors.blue,
                       elevation: 0,
                     ),
                   ],
                 ),
               ),
-            )
-        ),
+            )),
       ],
     );
   }

@@ -181,6 +181,7 @@ class LoginScreen extends StatelessWidget {
                                   children: <Widget>[
                                     TextFormField(
                                       controller: _emailController,
+                                      keyboardType: TextInputType.emailAddress,
                                       validator: (text) {
                                         if (text == null || text.isEmpty) {
                                           return 'Please enter you email.';

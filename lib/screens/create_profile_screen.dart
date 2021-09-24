@@ -28,6 +28,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   DateTime? selectedDate;
 
   final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _aboutController = TextEditingController();
   final _createProfileForm = GlobalKey<FormState>();
   RangeValues _currentRangeValues = const RangeValues(16, 80);
 
@@ -38,10 +39,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
   _imgFromCamera() async {
     XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        // imageQuality: 50,
-        maxHeight: 200,
-        maxWidth: 200,
+      source: ImageSource.camera,
+      // imageQuality: 50,
+      maxHeight: 200,
+      maxWidth: 200,
     );
 
     setState(() {
@@ -60,6 +61,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     setState(() {
       _image = image!;
     });
+
+    Navigator.of(context).pop();
   }
 
   void _saveProfile(BuildContext context) async {
@@ -72,15 +75,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       showDialog<String>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-            title: const Text('No country selected'),
-            content: Text('Please select a country you are from.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
-          ));
+                title: const Text('No country selected'),
+                content: Text('Please select a country you are from.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ));
 
       return;
     }
@@ -88,9 +91,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return Center(child: CircularProgressIndicator(),);
-        }
-    );
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        });
 
     bool result = false;
     try {
@@ -98,13 +102,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       user.setName(_firstNameController.text);
       CubeUser? _cUser = user.user;
       if (_cUser == null) {
-        _cUser =  await createConnectyCubeSession(context);
+        _cUser = await createConnectyCubeSession(context);
       }
-      log('1');
+
       if (_image != null) {
         await uploadProfileImage(File(_image!.path), context);
       }
-      log('2');
+
       Profile profile = Profile(
         _firstNameController.text,
         DateFormat('yyyy-MM-dd').format(selectedDate!),
@@ -114,38 +118,36 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           _currentRangeValues.end.toInt(),
         ),
         _cUser!.id,
+        _aboutController.text, // about
       );
       result = await updateProfile(profile);
-      log('3');
+
     } on Exception catch (e) {
       Navigator.pop(context);
       showDialog<String>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-            title: const Text('Failed'),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'Cancel'),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
-          ));
+                title: const Text('Failed'),
+                content: Text(e.toString()),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ));
     }
 
     Navigator.pop(context);
 
     // If success
     if (result) {
-      log('Success');
-      Navigator.push(
-          context,
-          new MaterialPageRoute(
-              builder: (context) => new OneMoreStepScreen()));
+      Navigator.push(context,
+          new MaterialPageRoute(builder: (context) => new OneMoreStepScreen()));
     }
   }
 
@@ -172,37 +174,34 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         });
   }
 
-  void _showImagePicker (context) {
+  void _showImagePicker(context) {
     showModalBottomSheet(
-      context: context,
-      builder: (BuildContext bc) {
-        return SafeArea(
-          child: Container(
-            child: new Wrap(
-              children: <Widget>[
-                new ListTile(
-                  leading: new Icon(Icons.photo_library),
-                  title: new Text('Photo Library'),
-                  onTap: () {
-                    _imgFromGallery();
-                    Navigator.of(context).pop();
-                  }),
-                new ListTile(
-                  leading: new Icon(Icons.photo_camera),
-                  title: new Text('Camera'),
-                  onTap: () {
-                    _imgFromCamera();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: new Wrap(
+                children: <Widget>[
+                  new ListTile(
+                      leading: new Icon(Icons.photo_library),
+                      title: new Text('Photo Library'),
+                      onTap: () {
+                        _imgFromGallery();
+                      }),
+                  new ListTile(
+                    leading: new Icon(Icons.photo_camera),
+                    title: new Text('Camera'),
+                    onTap: () {
+                      _imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -222,253 +221,302 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 },
                 child: SingleChildScrollView(
                   child: Container(
-                      height: 640,
+                      height: 720,
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'Create a profile',
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.w400),
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'Create a profile',
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w400),
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                            child: Text(
-                              'Having a profile means you know this is a sage place to connect with people!',
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w400),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                              child: Text(
+                                'Having a profile means you know this is a sage place to connect with people!',
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w400),
+                              ),
                             ),
-                          ),
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    _showImagePicker(context);
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 52,
-                                    backgroundColor: Color.fromRGBO(79, 152, 248, 1),
-                                    child: _image != null
-                                        ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: Image.file(
-                                        File(_image!.path),
-                                        width: 100,
-                                        height: 100,
-                                        fit: BoxFit.fitHeight,
-                                      ),
-                                    )
-                                        : Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[200],
-                                          borderRadius: BorderRadius.circular(50)),
-                                      width: 100,
-                                      height: 100,
-                                      child: Icon(
-                                        Icons.camera_alt_outlined,
-                                        size: 40,
-                                        color: Colors.grey[800],
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 16),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _showImagePicker(context);
+                                      },
+                                      child: CircleAvatar(
+                                        radius: 52,
+                                        backgroundColor:
+                                            Color.fromRGBO(79, 152, 248, 1),
+                                        child: _image != null
+                                            ? ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                child: Image.file(
+                                                  File(_image!.path),
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.fitHeight,
+                                                ),
+                                              )
+                                            : Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.grey[200],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50)),
+                                                width: 100,
+                                                height: 100,
+                                                child: Icon(
+                                                  Icons.camera_alt_outlined,
+                                                  size: 40,
+                                                  color: Colors.grey[800],
+                                                ),
+                                              ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-                                  child:  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Add profile pic'),
-                                      Text(
-                                          'Adding a photo will help to verify your profile',
-                                          softWrap: true,
-                                          maxLines: 2,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                          )
-                                        // overflow: TextOverflow.,
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            )
-                          ),
-                          Expanded(
-                              child: Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 25),
-                                  child: Form(
-                                    key: _createProfileForm,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        OutlineTextField(
-                                          controller:
-                                              _firstNameController,
-                                          hintText: 'Your first name',
-                                          validator: (text) {
-                                            if (text == null || text.isEmpty)
-                                              return 'Please enter a name.';
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Add profile pic'),
+                                          Text(
+                                              'Adding a photo will help to verify your profile',
+                                              softWrap: true,
+                                              maxLines: 2,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                              )
+                                            )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                )),
+                            Expanded(
+                                child: Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 25),
+                                    child: Form(
+                                        key: _createProfileForm,
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              OutlineTextField(
+                                                controller:
+                                                    _firstNameController,
+                                                hintText: 'Your first name',
+                                                validator: (text) {
+                                                  if (text == null ||
+                                                      text.isEmpty)
+                                                    return 'Please enter a name.';
 
-                                            return null;
-                                          },
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            showCountryPicker(
-                                              context: context,
-                                              //Optional.  Can be used to exclude(remove) one ore more country from the countries list (optional).
-                                              exclude: <String>['KN', 'MF'],
-                                              //Optional. Shows phone code before the country name.
-                                              showPhoneCode: false,
-                                              onSelect: (Country country) {
-                                                setState(() {
-                                                  _country = country;
-                                                });
-                                              },
-                                              // Optional. Sets the theme for the country list picker.
-                                              countryListTheme: CountryListThemeData(
-                                                // Optional. Sets the border radius for the bottomsheet.
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(40.0),
-                                                  topRight: Radius.circular(40.0),
-                                                ),
-                                                // Optional. Styles the search field.
-                                                inputDecoration: InputDecoration(
-                                                  labelText: 'Search',
-                                                  hintText: 'Start typing to search',
-                                                  prefixIcon: const Icon(Icons.search),
-                                                  border: OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                      color: const Color(0xFF8C98A8).withOpacity(0.2),
-                                                    ),
-                                                  ),
-                                                ),
+                                                  return null;
+                                                },
                                               ),
-                                            );
-                                          },
-                                          child: Container(
-                                              height: 56,
-                                              width: double.infinity,
-                                              alignment: Alignment.centerLeft,
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                                              decoration:
-                                                  BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(6),
+                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              TextFormField(
+                                                controller: _aboutController,
+                                                decoration: InputDecoration(
+                                                  hintText: 'Short description about yourself',
+                                                ),
+                                                minLines: 1,
+                                                maxLines: 5,
+                                                validator: (text) {
+                                                  if (text == null || text.isEmpty) {
+                                                    return 'Please enter description.';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showCountryPicker(
+                                                    context: context,
+                                                    //Optional. Shows phone code before the country name.
+                                                    showPhoneCode: false,
+                                                    onSelect: (Country country) {
+                                                      setState(() {
+                                                        _country = country;
+                                                      });
+                                                    },
+                                                    // Optional. Sets the theme for the country list picker.
+                                                    countryListTheme: CountryListThemeData(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(
+                                                                8.0),
+                                                        topRight:
+                                                            Radius.circular(
+                                                                8.0),
+                                                      ),
+                                                      // Optional. Styles the search field.
+                                                      inputDecoration: InputDecoration(
+                                                        labelText: 'Search',
+                                                        hintText: 'Start typing to search',
+                                                        prefixIcon: const Icon(Icons.search),
+                                                        border: OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                            color: const Color(0xFF8C98A8).withOpacity(0.2),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                    height: 56,
+                                                    width: double.infinity,
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 12),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6),
+                                                        border: Border.all(
+                                                          width: 1.6,
+                                                          color: Color.fromRGBO(
+                                                              218, 218, 236, 1),
+                                                        )),
+                                                    child: Text(_country == null
+                                                        ? 'Country you\'re from'
+                                                        : _country!
+                                                            .displayNameNoCountryCode)),
+                                              ),
+                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              Container(
+                                                  height: 56,
+                                                  width: double.infinity,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(horizontal: 2),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
                                                       border: Border.all(
                                                         width: 1.6,
-                                                        color: Color.fromRGBO(218, 218, 236, 1),
-                                                      )
-                                                  ),
-                                              child: Text(_country == null ? 'Country you\'re from' : _country!.displayNameNoCountryCode)
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 56,
-                                          width: double.infinity,
-                                          padding: const EdgeInsets
-                                              .symmetric(horizontal: 2),
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      6),
-                                              border: Border.all(
-                                                width: 1.6,
-                                                color: Color.fromRGBO(
-                                                    218, 218, 236, 1),
-                                              )),
-                                          child: TextButton(
-                                            child: Container(
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    child: Text(
-                                                      selectedDate == null ? 'Year of birth' : DateFormat('yyyy-MM-dd').format(selectedDate!),
-                                                      style: TextStyle(
-                                                          // textBaseline: TextBaseline.alphabetic,
-                                                          color: placeholderGrey,
-                                                          fontFamily:'Roboto',
-                                                          fontWeight: FontWeight.w400,
-                                                          fontSize: 16
+                                                        color: Color.fromRGBO(
+                                                            218, 218, 236, 1),
+                                                      )),
+                                                  child: TextButton(
+                                                      child: Container(
+                                                        child: Row(
+                                                          children: [
+                                                            Container(
+                                                                child: Text(
+                                                              selectedDate ==
+                                                                      null
+                                                                  ? 'Year of birth'
+                                                                  : DateFormat(
+                                                                          'yyyy-MM-dd')
+                                                                      .format(
+                                                                          selectedDate!),
+                                                              style: TextStyle(
+                                                                  // textBaseline: TextBaseline.alphabetic,
+                                                                  color:
+                                                                      placeholderGrey,
+                                                                  fontFamily:
+                                                                      'Roboto',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  fontSize: 16),
+                                                            ))
+                                                          ],
+                                                        ),
                                                       ),
+                                                      onPressed: () {
+                                                        _showDatePicker(
+                                                            context);
+                                                      })),
+
+                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              Container(
+                                                height: 96,
+                                                width: double.infinity,
+                                                alignment: Alignment.centerLeft,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 12),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                    border: Border.all(
+                                                      width: 1.6,
+                                                      color: Color.fromRGBO(
+                                                          218, 218, 236, 1),
+                                                    )),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Show age range in feed',
+                                                      style: TextStyle(
+                                                          color:
+                                                              placeholderGrey),
+                                                    ),
+                                                    RangeSlider(
+                                                      values:
+                                                          _currentRangeValues,
+                                                      min: 16,
+                                                      max: 80,
+                                                      divisions: 10,
+                                                      labels: RangeLabels(
+                                                        _currentRangeValues
+                                                            .start
+                                                            .round()
+                                                            .toString(),
+                                                        _currentRangeValues.end
+                                                            .round()
+                                                            .toString(),
+                                                      ),
+                                                      onChanged:
+                                                          (RangeValues values) {
+                                                        setState(() {
+                                                          _currentRangeValues =
+                                                              values;
+                                                        });
+                                                      },
                                                     )
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              _showDatePicker(context);
-                                            }
-                                          )
-                                        ),
-                                        Container(
-                                          height: 96,
-                                          width: double.infinity,
-                                          alignment: Alignment.centerLeft,
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 12),
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      6),
-                                              border: Border.all(
-                                                width: 1.6,
-                                                color: Color.fromRGBO(218, 218, 236, 1),
-                                              )),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Show age range in feed',
-                                                style: TextStyle(color: placeholderGrey),
-                                              ),
-                                              RangeSlider(
-                                                values: _currentRangeValues,
-                                                min: 16,
-                                                max: 80,
-                                                divisions: 10,
-                                                labels: RangeLabels(
-                                                  _currentRangeValues.start.round().toString(),
-                                                  _currentRangeValues.end.round().toString(),
+                                                  ],
                                                 ),
-                                                onChanged: (RangeValues values) {
-                                                  setState(() {
-                                                    _currentRangeValues = values;
-                                                  });
-                                                },
+                                              ),
+                                              RoundedGradientButton(
+                                                buttonText: 'Save',
+                                                width: 300,
+                                                onPressed: () =>
+                                                    _saveProfile(context),
                                               )
-                                            ],
-                                          ),
-                                        ),
-                                        RoundedGradientButton(
-                                          buttonText: 'Save',
-                                          width: 300,
-                                          onPressed: () => _saveProfile(context),
-                                        )
-                                      ]
-                                    )
-                                  )
-                                )
-                              )
-                        ]
-                      )),
+                                            ]))))
+                          ])),
                 ))));
   }
 }
