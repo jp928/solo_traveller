@@ -1,10 +1,17 @@
+import 'dart:developer';
+
+import 'package:connectycube_sdk/connectycube_chat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/futures/get_user_profile_future.dart';
 import 'package:solo_traveller/models/person.dart';
 import 'package:solo_traveller/models/profile.dart';
+import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/photo_hero.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'chat_dialog_screen.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
   final int userId;
@@ -21,6 +28,8 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
 
   Future<void> _retrieveProfile(String userId) async {
     var profile = await getUserProfile(id: userId);
+    log('======>');
+    log(profile.chatAccountId ?? "");
     setState(() {
       _profile = profile;
     });
@@ -57,6 +66,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final person = ModalRoute.of(context)!.settings.arguments as Person;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xffF4F4F4),
@@ -85,7 +95,26 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                   ],
                 )
             );
+          } else {
+            MyCubeUser myCubeUser = context.read<MyCubeUser>();
+
+            CubeDialog newDialog = CubeDialog(CubeDialogType.PRIVATE, occupantsIds: [
+              int.parse(_profile?.chatAccountId ?? '0'),
+              myCubeUser.user!.id ?? 0,
+            ]);
+
+            log('====>>');
+            log(_profile?.chatAccountId);
+            createDialog(newDialog).then((createdDialog) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatDialogScreen(myCubeUser.user!, createdDialog),
+                ),
+              );
+            });
           }
+
           // Add your onPressed code here!
         },
         // label: const Text('Approve'),

@@ -117,7 +117,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           _currentRangeValues.start.toInt(),
           _currentRangeValues.end.toInt(),
         ),
-        _cUser!.id,
+        _cUser!.id.toString(),
         _aboutController.text, // about
       );
       result = await updateProfile(profile);

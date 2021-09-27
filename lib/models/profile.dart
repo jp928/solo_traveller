@@ -7,7 +7,7 @@ class Profile {
   Settings? settings;
   String firstName;
   String dateOfBirth;
-  int? chatAccountId;
+  String? chatAccountId;
   String countryCode;
   String? about;
   int momentCount;

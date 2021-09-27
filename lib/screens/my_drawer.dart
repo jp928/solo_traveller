@@ -6,6 +6,8 @@ import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
 
+import 'my_chats_screen.dart';
+
 class MyDrawer extends StatelessWidget {
   const MyDrawer({
     Key? key,
@@ -112,8 +114,19 @@ class MyDrawer extends StatelessWidget {
                     leading: const Icon(Icons.people),
                     title: const Text('My profile'),
                     onTap: (){
-                      _logout(context);
+                      // _logout(context);
 
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.chat),
+                    title: const Text('Chat'),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => new MyChatsScreen())
+                      );
                     },
                   ),
                   ListTile(
@@ -121,7 +134,6 @@ class MyDrawer extends StatelessWidget {
                     title: const Text('Logout'),
                     onTap: (){
                       _logout(context);
-
                     },
                   ),
                 ],
