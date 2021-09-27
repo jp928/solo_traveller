@@ -99,12 +99,8 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
             MyCubeUser myCubeUser = context.read<MyCubeUser>();
 
             CubeDialog newDialog = CubeDialog(CubeDialogType.PRIVATE, occupantsIds: [
-              int.parse(_profile?.chatAccountId ?? '0'),
-              myCubeUser.user!.id ?? 0,
+              int.parse(_profile?.chatAccountId ?? '0')
             ]);
-
-            log('====>>');
-            log(_profile?.chatAccountId);
             createDialog(newDialog).then((createdDialog) {
               Navigator.pushReplacement(
                 context,

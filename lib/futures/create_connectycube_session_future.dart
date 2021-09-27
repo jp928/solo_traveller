@@ -21,10 +21,11 @@ Future<CubeUser?> createConnectyCubeSession(
   } else {
     user = await signIn(user);
   }
-
-  log(user.toString());
+  
   myCubeUser.setUser(user);
   user.password = myCubeUser.email;
+
+  await CubeChatConnection.instance.login(user);
 
   final session = await createSession(user);
   context.read<MyCubeSession>().setSession(session);

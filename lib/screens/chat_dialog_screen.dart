@@ -83,7 +83,8 @@ class ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _initCubeChat();
-
+    log('=====>>>>>');
+    log(this._cubeDialog.toString());
     isLoading = false;
     imageUrl = '';
   }
@@ -128,6 +129,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   void onReceiveMessage(CubeMessage message) {
     log("onReceiveMessage message= $message");
+    // log()
     if (message.dialogId != _cubeDialog.dialogId ||
         message.senderId == _cubeUser.id) return;
 
@@ -208,9 +210,14 @@ class ChatScreenState extends State<ChatScreen> {
 
   void onSendMessage(CubeMessage message) async {
     log("onSendMessage message= $message");
+    log(_cubeDialog.toString());
+
+    log("======================");
+    log(_cubeUser.id.toString());
     textEditingController.clear();
     await _cubeDialog.sendMessage(message);
     message.senderId = _cubeUser.id;
+
     addMessageToListView(message);
     listScrollController.animateTo(0.0,
         duration: Duration(milliseconds: 300), curve: Curves.easeOut);

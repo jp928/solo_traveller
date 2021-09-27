@@ -10,7 +10,7 @@ Future<CubeUser?> createConnectyCubeSessionWithFacebook(BuildContext context, St
   await createSession();
 
   CubeUser user = await signInUsingSocialProvider(CubeProvider.FACEBOOK, accessToken);
-
+  await CubeChatConnection.instance.login(user);
   myCubeUser.setUser(user);
 
   final session = await createSession(user);
