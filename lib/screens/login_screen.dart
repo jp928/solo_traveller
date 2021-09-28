@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/futures/auth_future.dart';
@@ -5,6 +7,8 @@ import 'package:solo_traveller/futures/create_connecty_cube_session_with_faceboo
 import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
 import 'package:solo_traveller/futures/external_auth_future.dart';
 import 'package:solo_traveller/futures/facebook_login_future.dart';
+import 'package:solo_traveller/futures/get_my_profile_future.dart';
+import 'package:solo_traveller/models/profile.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 
@@ -95,8 +99,11 @@ class LoginScreen extends StatelessWidget {
       user.setEmail(email);
 
       await createConnectyCubeSession(context, withSignUp: false);
+
       result = await auth(email, _passwordController.text);
 
+      Profile profile = await getMyProfile();
+      user.setProfileImage(profile.profileImage);
     } on Exception catch (e) {
       Navigator.pop(context);
       user.setEmail('');

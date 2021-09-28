@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
+import 'package:solo_traveller/widgets/avatar.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import 'chat_dialog_screen.dart';
 
@@ -14,7 +16,7 @@ class MyChatsScreen extends StatefulWidget {
 
 class _MyChatsScreenState extends State<MyChatsScreen> {
   CubeUser? currentUser;
-  var dialogList = <CubeDialog>[];
+  var dialogList = <Map<String, dynamic>>[];
   var loading = false;
 
   @override
@@ -47,15 +49,37 @@ class _MyChatsScreenState extends State<MyChatsScreen> {
           ));
     }
 
+    var futureList = dialogs.items.map<Future<Map<String, dynamic>>>((item) async {
+      CubeUser? participant = await _getParticipant(item);
+      String? lastUpdate =  item.updatedAt == null
+        ?
+        null
+        :
+        '${timeago.format(item.updatedAt, locale: 'en_short')} ago';
+
+      return {
+        'dialog': item,
+        'avatar': participant?.avatar,
+        'participantName': participant?.fullName,
+        'lastMessage': item.lastMessage,
+        'lastUpdate': lastUpdate
+      };
+    }).toList();
+
+    List<Map<String, dynamic>> _dialogList = await Future.wait(futureList);
     if (loading && dialogs != null) {
       setState(() {
         loading = false;
         dialogList.clear();
-        // dialogList = dialogs;
-        dialogList.addAll(dialogs.items);
-        // dialogList = dialogs.cast<CubeDialog>();
+        dialogList.addAll(_dialogList);
       });
     }
+  }
+
+  Future<CubeUser?> _getParticipant(CubeDialog dialog) async {
+    List<int> participants = dialog.occupantsIds!;
+    participants.remove(dialog.userId);
+    return getUserById(participants.first);
   }
 
   @override
@@ -94,10 +118,17 @@ class _MyChatsScreenState extends State<MyChatsScreen> {
                           child: RefreshIndicator(
                             child: ListView.separated(
                               itemBuilder: (context, index) {
-                                CubeDialog _dialog = dialogList[index];
+                                var item = dialogList[index];
+                                CubeDialog _dialog = item['dialog'];
+                                // log(_dialog.photo);
+                                log(_dialog.toString());
+
 
                                 return GestureDetector(
                                   onTap: () {
+                                    log('-------------------------------------');
+                                    log(currentUser!.id!.toString());
+                                    print(_dialog.occupantsIds);
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -107,10 +138,11 @@ class _MyChatsScreenState extends State<MyChatsScreen> {
                                   },
                                   child: Container(
                                     padding: EdgeInsets.symmetric(vertical: 8),
-                                    child: Row(
-                                      children: [
-                                        Text(_dialog.name ?? ''),
-                                      ],
+                                    child: ListTile(
+                                      leading: Avatar(image: item['avatar']),
+                                      title: Text(item['participantName'] ?? ''),
+                                      subtitle: Text(item['lastMessage'] ?? '', style: TextStyle(color: Color(0xff4A4A4A), fontSize: 10),),
+                                      trailing: Text(item['lastUpdate'] ?? '')
                                     ),
                                   )
                                 );

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/constants/colors.dart';
 import 'package:solo_traveller/futures/create_connectycube_session_future.dart';
+import 'package:solo_traveller/futures/get_my_profile_future.dart';
 import 'package:solo_traveller/futures/update_profile_future.dart';
 import 'package:solo_traveller/futures/upload_profile_image_future.dart';
 import 'package:solo_traveller/models/profile.dart';
@@ -113,14 +114,20 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         _firstNameController.text,
         DateFormat('yyyy-MM-dd').format(selectedDate!),
         _country!.countryCode,
+        _cUser!.id.toString(),
+        _aboutController.text, // about
         Settings(
           _currentRangeValues.start.toInt(),
           _currentRangeValues.end.toInt(),
         ),
-        _cUser!.id.toString(),
-        _aboutController.text, // about
       );
       result = await updateProfile(profile);
+
+      // @TODO: This can be improved
+      Profile _updatedProfile = await getMyProfile();
+      if (_updatedProfile.profileImage != null) {
+        user.setProfileImage(_updatedProfile.profileImage!);
+      }
 
     } on Exception catch (e) {
       Navigator.pop(context);

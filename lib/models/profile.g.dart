@@ -10,16 +10,17 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['firstName'] as String,
       json['dateOfBirth'] as String,
       json['countryCode'] as String?,
+      json['chatAccountId'] as String?,
+      json['about'] as String?,
       json['settings'] == null
           ? null
           : Settings.fromJson(json['settings'] as Map<String, dynamic>),
-      json['chatAccountId'] as String?,
-      json['about'] as String?,
       json['momentCount'] as int? ?? 0,
       json['followerCount'] as int? ?? 0,
       json['followingCount'] as int? ?? 0,
       (json['interests'] as List<dynamic>?)?.map((e) => e as String?).toList(),
       json['gender'] as String?,
+      json['profileImage'] as String?,
     );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
@@ -34,4 +35,5 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'followingCount': instance.followingCount,
       'interests': instance.interests,
       'gender': instance.gender,
+      'profileImage': instance.profileImage,
     };

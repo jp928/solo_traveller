@@ -18,8 +18,6 @@ Future<bool> updateProfile(Profile profile) async {
   );
 
   if (response.statusCode == 200) {
-    log('=========>>>>>>>');
-    log(response.body);
     return true;
   } else {
     var message = 'Failed';

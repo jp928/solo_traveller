@@ -15,20 +15,22 @@ class Profile {
   int followingCount;
   List<String?>? interests = [];
   String? gender;
+  String? profileImage;
 
   Profile(
     this.firstName,
     this.dateOfBirth,
     [
       this.countryCode,
-      this.settings,
       this.chatAccountId,
       this.about,
+      this.settings,
       this.momentCount = 0,
       this.followerCount = 0,
       this.followingCount = 0,
       this.interests,
       this.gender,
+      this.profileImage,
     ]
   );
 

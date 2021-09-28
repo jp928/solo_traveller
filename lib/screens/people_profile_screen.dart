@@ -98,6 +98,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
             MyCubeUser myCubeUser = context.read<MyCubeUser>();
 
             CubeDialog newDialog = CubeDialog(CubeDialogType.PRIVATE, occupantsIds: [
+              myCubeUser.user?.id ?? 0,
               int.parse(_profile?.chatAccountId ?? '0')
             ]);
             createDialog(newDialog).then((createdDialog) {
@@ -106,6 +107,20 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                 MaterialPageRoute(
                   builder: (context) => ChatDialogScreen(myCubeUser.user!, createdDialog),
                 ),
+              );
+            }).onError((error, stackTrace) {
+              showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Failed'),
+                    content: Text(error.toString()),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'OK'),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  )
               );
             });
           }

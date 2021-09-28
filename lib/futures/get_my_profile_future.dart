@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/models/profile.dart';
+import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
 
 Future<Profile> getMyProfile() async {

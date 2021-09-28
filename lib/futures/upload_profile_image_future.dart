@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:connectycube_sdk/connectycube_core.dart';
+import 'package:connectycube_sdk/connectycube_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mime/mime.dart';
@@ -46,7 +47,13 @@ Future<bool> uploadProfileImage(File image, BuildContext context) async {
     user?.avatar = profileImage['url'];
 
     if (user != null) {
-      await updateUser(user);
+      uploadFile(image, isPublic: false)
+          .then((cubeFile) {
+        user.avatar = cubeFile.uid;
+        return updateUser(user);
+      }).onError((error, stackTrace) {
+        throw Exception(error.toString());
+      });
     }
 
     return true;

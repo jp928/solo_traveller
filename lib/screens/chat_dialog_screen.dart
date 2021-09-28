@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:connectycube_sdk/connectycube_sdk.dart';
 import 'package:solo_traveller/widgets/avatar_text.dart';
@@ -18,12 +20,10 @@ class ChatDialogScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffe9ecef),
       appBar: AppBar(
-        title: Text(
-          _cubeDialog.name != null ? _cubeDialog.name! : '',
-          style: TextStyle(
-            color: Color(0xff4A4A4A),
-          )
-        ),
+        title: Text(_cubeDialog.name != null ? _cubeDialog.name! : '',
+            style: TextStyle(
+              color: Color(0xff4A4A4A),
+            )),
         iconTheme: IconThemeData(
           color: Color.fromRGBO(74, 90, 247, 1), //change your color here
         ),
@@ -82,6 +82,8 @@ class ChatScreenState extends State<ChatScreen> {
   List<CubeMessage> _unreadMessages = [];
   List<CubeMessage> _unsentMessages = [];
 
+  final ImagePicker _picker = ImagePicker();
+
   ChatScreenState(this._cubeUser, this._cubeDialog);
 
   @override
@@ -102,19 +104,21 @@ class ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  // void openGallery() async {
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //     type: FileType.image,
-  //   );
-  //
-  //   if (result == null) return;
-  //
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //   imageFile = File(result.files.single.path);
-  //   uploadImageFile();
-  // }
+  void openGallery() async {
+    XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+      maxHeight: 200,
+      maxWidth: 200,
+    );
+
+    if (image?.path == null) {
+      return;
+    }
+
+    imageFile = File(image!.path);
+    await uploadImageFile();
+  }
 
   Future uploadImageFile() async {
     uploadFile(imageFile, isPublic: true, onProgress: (progress) {
@@ -301,71 +305,6 @@ class ChatScreenState extends State<ChatScreen> {
       }
     }
 
-    Widget getReadDeliveredWidget() {
-      bool messageIsRead() {
-        log("[getReadDeliveredWidget] messageIsRead");
-        if (_cubeDialog.type == CubeDialogType.PRIVATE)
-          return message.readIds != null &&
-              (message.recipientId == null ||
-                  message.readIds!.contains(message.recipientId));
-        return message.readIds != null &&
-            message.readIds!.any(
-                (int id) => id != _cubeUser.id && _occupants.keys.contains(id));
-      }
-
-      bool messageIsDelivered() {
-        log("[getReadDeliveredWidget] messageIsDelivered");
-        if (_cubeDialog.type == CubeDialogType.PRIVATE)
-          return message.deliveredIds?.contains(message.recipientId) ?? false;
-        return message.deliveredIds != null &&
-            message.deliveredIds!.any(
-                (int id) => id != _cubeUser.id && _occupants.keys.contains(id));
-      }
-
-      if (messageIsRead()) {
-        log("[getReadDeliveredWidget] if messageIsRead");
-        return Stack(children: <Widget>[
-          Icon(
-            Icons.check,
-            size: 15.0,
-            color: Colors.blueAccent,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: Icon(
-              Icons.check,
-              size: 15.0,
-              color: Colors.blueAccent,
-            ),
-          )
-        ]);
-      } else if (messageIsDelivered()) {
-        log("[getReadDeliveredWidget] if messageIsDelivered");
-        return Stack(children: <Widget>[
-          Icon(
-            Icons.check,
-            size: 15.0,
-            color: Colors.grey,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: Icon(
-              Icons.check,
-              size: 15.0,
-              color: Colors.grey,
-            ),
-          )
-        ]);
-      } else {
-        log("[getReadDeliveredWidget] sent");
-        return Icon(
-          Icons.check,
-          size: 15.0,
-          color: Colors.grey,
-        );
-      }
-    }
-
     Widget getDateWidget() {
       return Text(
         DateFormat('HH:mm').format(
@@ -416,42 +355,38 @@ class ChatScreenState extends State<ChatScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                // CachedNetworkImage(
-                                //   placeholder: (context, url) => Container(
-                                //     child: CircularProgressIndicator(
-                                //       valueColor: AlwaysStoppedAnimation<Color>(
-                                //           Color(0xfff5a623)),
-                                //     ),
-                                //     width: 200.0,
-                                //     height: 200.0,
-                                //     padding: EdgeInsets.all(70.0),
-                                //     decoration: BoxDecoration(
-                                //       color: Colors.grey,
-                                //       borderRadius: BorderRadius.all(
-                                //         Radius.circular(8.0),
-                                //       ),
-                                //     ),
-                                //   ),
-                                //   errorWidget: (context, url, error) =>
-                                //       Material(
-                                //         child: Image.asset(
-                                //           'images/img_not_available.jpeg',
-                                //           width: 200.0,
-                                //           height: 200.0,
-                                //           fit: BoxFit.cover,
-                                //         ),
-                                //         borderRadius: BorderRadius.all(
-                                //           Radius.circular(8.0),
-                                //         ),
-                                //         clipBehavior: Clip.hardEdge,
-                                //       ),
-                                //   imageUrl: message.attachments!.first.url!,
-                                //   width: 200.0,
-                                //   height: 200.0,
-                                //   fit: BoxFit.cover,
-                                // ),
+                                CachedNetworkImage(
+                                  placeholder: (context, url) => Container(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Color(0xfff5a623)),
+                                    ),
+                                    width: 200.0,
+                                    height: 200.0,
+                                    padding: EdgeInsets.all(70.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8.0),
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) => Material(
+                                    child: Icon(
+                                      Icons.error_outline,
+                                      size: 200,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8.0),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                  ),
+                                  imageUrl: message.attachments!.first.url!,
+                                  width: 200.0,
+                                  height: 200.0,
+                                  fit: BoxFit.cover,
+                                ),
                                 getDateWidget(),
-                                getReadDeliveredWidget(),
                               ]),
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                           clipBehavior: Clip.hardEdge,
@@ -476,23 +411,25 @@ class ChatScreenState extends State<ChatScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Container(
-                                padding:
-                                EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                margin: EdgeInsets.only(
+                                  padding: EdgeInsets.fromLTRB(
+                                      15.0, 10.0, 15.0, 10.0),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  margin: EdgeInsets.only(
                                     bottom: 5,
-                                ),
-                                child: Text(
-                                  message.body!,
-                                  style: TextStyle(color: Color(0xff404040)),
-                                )
-                              ),
+                                  ),
+                                  child: Text(
+                                    message.body!,
+                                    style: TextStyle(color: Color(0xff404040)),
+                                  )),
                               getDateWidget(),
                               // getReadDeliveredWidget(),
                               Padding(
-                                padding: EdgeInsets.only(bottom: isLastMessageRight(index) ? 10.0 : 5.0,),
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      isLastMessageRight(index) ? 10.0 : 5.0,
+                                ),
                               )
                             ],
                           ),
@@ -557,41 +494,39 @@ class ChatScreenState extends State<ChatScreen> {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // CachedNetworkImage(
-                                  //   placeholder: (context, url) => Container(
-                                  //     child: CircularProgressIndicator(
-                                  //       valueColor:
-                                  //       AlwaysStoppedAnimation<Color>(
-                                  //           Color(0xfff5a623)),
-                                  //     ),
-                                  //     width: 200.0,
-                                  //     height: 200.0,
-                                  //     padding: EdgeInsets.all(70.0),
-                                  //     decoration: BoxDecoration(
-                                  //       color: Colors.grey,
-                                  //       borderRadius: BorderRadius.all(
-                                  //         Radius.circular(8.0),
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  //   errorWidget: (context, url, error) =>
-                                  //       Material(
-                                  //         child: Image.asset(
-                                  //           'images/img_not_available.jpeg',
-                                  //           width: 200.0,
-                                  //           height: 200.0,
-                                  //           fit: BoxFit.cover,
-                                  //         ),
-                                  //         borderRadius: BorderRadius.all(
-                                  //           Radius.circular(8.0),
-                                  //         ),
-                                  //         clipBehavior: Clip.hardEdge,
-                                  //       ),
-                                  //   imageUrl: message.attachments!.first.url!,
-                                  //   width: 200.0,
-                                  //   height: 200.0,
-                                  //   fit: BoxFit.cover,
-                                  // ),
+                                  CachedNetworkImage(
+                                    placeholder: (context, url) => Container(
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Color(0xfff5a623)),
+                                      ),
+                                      width: 200.0,
+                                      height: 200.0,
+                                      padding: EdgeInsets.all(70.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Material(
+                                      child: Icon(
+                                        Icons.error_outline,
+                                        size: 200,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8.0),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                    imageUrl: message.attachments!.first.url!,
+                                    width: 200.0,
+                                    height: 200.0,
+                                    fit: BoxFit.cover,
+                                  ),
                                   getDateWidget(),
                                 ]),
                             borderRadius:
@@ -612,23 +547,26 @@ class ChatScreenState extends State<ChatScreen> {
                     : message.body != null && message.body!.isNotEmpty
                         ? Flexible(
                             child: Column(
-                              children: [
-                                Container(
-                                    padding:
-                                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                                    decoration: BoxDecoration(
-                                        color: Color(0xff718CFB),
-                                        borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.only(left: 10.0, bottom: 5),
-                                    child: Text(
-                                      message.body!,
-                                      style: TextStyle(color: Colors.white),
-                                    )
-                                ),
-                                getDateWidget()
-                              ],
-                            )
-                          )
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  padding: EdgeInsets.fromLTRB(
+                                      15.0, 10.0, 15.0, 10.0),
+                                  decoration: BoxDecoration(
+                                      color: Color(0xff718CFB),
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  margin:
+                                      EdgeInsets.only(left: 10.0, bottom: 5),
+                                  child: Text(
+                                    message.body!,
+                                    style: TextStyle(color: Colors.white),
+                                  )),
+                              Container(
+                                padding: EdgeInsets.only(left: 8),
+                                child: getDateWidget(),
+                              )
+                            ],
+                          ))
                         : Container(
                             child: Text(
                               "Empty",
@@ -705,12 +643,10 @@ class ChatScreenState extends State<ChatScreen> {
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 1.0),
               child: IconButton(
-                icon: Icon(Icons.image),
+                icon: Icon(Icons.image_outlined),
                 onPressed: () {
-                  // openGallery();
-                  log('hello');
+                  openGallery();
                 },
-                // color: Colors.grey,
               ),
             ),
             color: Colors.white,

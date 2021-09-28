@@ -8,6 +8,7 @@ import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'chat_dialog_screen.dart';
+import 'edit_my_profile_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
   @override
@@ -19,7 +20,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
   Future<void> _retrieveMyProfile() async {
     var profile = await getMyProfile();
-
     setState(() {
       _profile = profile;
     });
@@ -68,6 +68,24 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           'My profile',
           style: TextStyle(color: Colors.black54),
         ),
+        actions: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (context) => new EditMyProfileScreen())
+                  );
+                },
+                child: Icon(
+                  Icons.edit_outlined,
+                  size: 26.0,
+                ),
+              )
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -118,7 +136,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  person.profileImage == null ?
+                  _profile?.profileImage == null ?
                   Icon(
                     Icons.person,
                     size: 32,
@@ -126,7 +144,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ):
                   ClipRRect(
                     borderRadius: BorderRadius.circular(32),
-                    child: Image.network(person.profileImage!,
+                    child: Image.network(_profile!.profileImage!,
                         height: 64, width: 64, fit: BoxFit.cover),
                   ),
                   Padding(
@@ -135,7 +153,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${person.name}',
+                      Text(_profile?.firstName ?? '',
                           style: TextStyle(fontSize: 24)),
                       Padding(
                         padding: EdgeInsets.only(top: 8),

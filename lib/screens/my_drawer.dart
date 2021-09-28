@@ -6,6 +6,7 @@ import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
 import 'package:solo_traveller/screens/my_profile_screen.dart';
+import 'package:solo_traveller/widgets/avatar.dart';
 
 import 'my_chats_screen.dart';
 
@@ -66,20 +67,7 @@ class MyDrawer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(50)),
                       width: 64,
                       height: 64,
-                      child: user.profileImage == null ? Icon(
-                        Icons.person,
-                        size: 32,
-                        color: Colors.grey[600],
-                      ) :
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(32),
-                          child: Image.network(
-                            user.profileImage!,
-                            width: 64,
-                            height: 64,
-                            fit: BoxFit.cover
-                          ),
-                        ),
+                      child: Avatar(image: user.profileImage)
                     )
                   ),
                   Column(

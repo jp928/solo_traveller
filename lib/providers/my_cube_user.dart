@@ -25,7 +25,7 @@ class MyCubeUser with ChangeNotifier, DiagnosticableTreeMixin {
     this._user = user;
   }
 
-  void setProfileImage(String profileImage) {
+  void setProfileImage(String? profileImage) {
     this._profileImage = profileImage;
   }
 
