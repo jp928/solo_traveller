@@ -27,7 +27,7 @@ class PhotoHero extends StatelessWidget {
             onTap: onTap,
             child: this.photo == null
                 ? Icon(
-                    Icons.camera_alt_outlined,
+                    Icons.person_outline_outlined,
                     size: width / 2,
                     color: Colors.grey[600],
                   )

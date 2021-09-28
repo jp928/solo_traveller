@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
+import 'package:solo_traveller/screens/my_profile_screen.dart';
 
 import 'my_chats_screen.dart';
 
@@ -66,7 +67,7 @@ class MyDrawer extends StatelessWidget {
                       width: 64,
                       height: 64,
                       child: user.profileImage == null ? Icon(
-                        Icons.camera_alt_outlined,
+                        Icons.person,
                         size: 32,
                         color: Colors.grey[600],
                       ) :
@@ -114,7 +115,12 @@ class MyDrawer extends StatelessWidget {
                     leading: const Icon(Icons.people),
                     title: const Text('My profile'),
                     onTap: (){
-                      // _logout(context);
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => new MyProfileScreen()
+                          )
+                      );
 
                     },
                   ),

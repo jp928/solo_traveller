@@ -8,7 +8,7 @@ class Profile {
   String firstName;
   String dateOfBirth;
   String? chatAccountId;
-  String countryCode;
+  String? countryCode;
   String? about;
   int momentCount;
   int followerCount;
@@ -19,8 +19,8 @@ class Profile {
   Profile(
     this.firstName,
     this.dateOfBirth,
-    this.countryCode,
     [
+      this.countryCode,
       this.settings,
       this.chatAccountId,
       this.about,
