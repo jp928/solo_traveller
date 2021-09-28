@@ -248,7 +248,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     'Mutual interests',
@@ -257,28 +257,28 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 12),
                   ),
-                Wrap(
-                    spacing: 8.0, // gap between adjacent chips
-                    runSpacing: 4.0, // gap between lines
-                    children: (_profile?.interests ?? []).map((interest) {
-                      return Container(
-                          height: 40,
-                          width: 108,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Color(0xff718CFB),
-                                radius: 16,
-                              ),
-                              Text(interest!,
-                                  style: TextStyle(
-                                      color: Color(0xff2E2F41), fontSize: 12)),
-                            ],
-                          )
-                      );
-                    }).toList()
+                  Wrap(
+                      spacing: 8.0, // gap between adjacent chips
+                      runSpacing: 4.0, // gap between lines
+                      children: (_profile?.interests ?? []).map((interest) {
+                        return Container(
+                            height: 40,
+                            width: 108,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Color(0xff718CFB),
+                                  radius: 16,
+                                ),
+                                Text(interest!,
+                                    style: TextStyle(
+                                        color: Color(0xff2E2F41), fontSize: 12)),
+                              ],
+                            )
+                        );
+                      }).toList()
                   )
                 ],
               ),
