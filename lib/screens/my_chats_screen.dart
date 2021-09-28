@@ -94,8 +94,8 @@ class _MyChatsScreenState extends State<MyChatsScreen> {
                           child: RefreshIndicator(
                             child: ListView.separated(
                               itemBuilder: (context, index) {
-                                log(dialogList[index].toString());
                                 CubeDialog _dialog = dialogList[index];
+
                                 return GestureDetector(
                                   onTap: () {
                                     Navigator.pushReplacement(

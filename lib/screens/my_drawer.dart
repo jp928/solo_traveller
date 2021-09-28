@@ -37,7 +37,7 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<MyCubeUser>();
-    print(user.user);
+
     return Drawer(
       child: MediaQuery.removePadding(
         context: context,

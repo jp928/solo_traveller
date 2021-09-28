@@ -1,11 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'dart:io';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
 

@@ -1,37 +1,34 @@
-
 import 'dart:convert';
-import 'dart:developer';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
-import 'package:solo_traveller/models/person.dart';
+import 'package:solo_traveller/utilities/parse_jwt.dart';
 
-import 'determine_position_future.dart';
-
-Future<List<Person>> getPeopleNearMe({ int pageNum = 1, int pageSize = 20, String distance = '2000'}) async {
+Future<bool> updateCustomerLocation(Position position) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
-  Position position = await determinePosition();
+  var tokenInfo = parseJwt(token!);
 
-  final response = await http.get(
-    Uri.parse('https://solodevelopment.tk/user/people?longitude=${position.longitude.toString()}&latitude=${position.latitude.toString()}&pageIndex=${pageNum.toString()}&pageSize=${pageSize.toString()}&distanceRange=$distance&groupToRow=false&rowItemCount=0'),
+  final response = await http.post(
+    Uri.parse('https://solodevelopment.tk/user/save_location'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     },
+    body: jsonEncode(<String, String>{
+      'userId': tokenInfo['sub'],
+      'longitude': position.longitude.toString(),
+      'latitude': position.latitude.toString(),
+    }),
   );
 
-  if (response.statusCode == 200 && response.body.isNotEmpty) {
-    List responseList = json.decode(response.body);
-
-    responseList.map((e) => print(e));
-    return responseList.map((data) => Person.fromJson(data)).toList();
-
+  if (response.statusCode == 200) {
+    return true;
   } else {
     if (response.statusCode == 401) {
       await refreshToken();
-      return getPeopleNearMe(pageNum: pageNum, pageSize: pageSize);
+      return updateCustomerLocation(position);
     }
 
     var message = 'Failed';

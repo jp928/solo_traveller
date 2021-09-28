@@ -28,8 +28,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
 
   Future<void> _retrieveProfile(String userId) async {
     var profile = await getUserProfile(id: userId);
-    log('======>');
-    log(profile.chatAccountId ?? "");
+
     setState(() {
       _profile = profile;
     });

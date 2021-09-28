@@ -17,17 +17,25 @@ Future<CubeUser?> createConnectyCubeSession(
   );
 
   if (withSignUp) {
-    user = await signUp(user);
+    user = await signUp(user).onError((error, stackTrace) {
+      throw Exception(error.toString());
+    });
   } else {
-    user = await signIn(user);
+    user = await signIn(user).onError((error, stackTrace) {
+      throw Exception(error.toString());
+    });
   }
-  
+
   myCubeUser.setUser(user);
   user.password = myCubeUser.email;
 
-  await CubeChatConnection.instance.login(user);
+  await CubeChatConnection.instance.login(user).onError((error, stackTrace) {
+    throw Exception(error.toString());
+  });
 
-  final session = await createSession(user);
+  final session = await createSession(user).onError((error, stackTrace) {
+    throw Exception(error.toString());
+  });
   context.read<MyCubeSession>().setSession(session);
 
   return session.user;

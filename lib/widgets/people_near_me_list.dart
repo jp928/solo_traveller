@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:solo_traveller/futures/get_people_near_me_future.dart';
+import 'package:solo_traveller/futures/update_customer_location_future.dart';
 import 'package:solo_traveller/models/person.dart';
 import 'package:solo_traveller/screens/people_profile_screen.dart';
 import 'package:solo_traveller/widgets/photo_hero.dart';
+import 'package:geolocator/geolocator.dart';
 
 class PeopleNearMeList extends StatefulWidget {
   @override
@@ -16,6 +21,9 @@ class _MomentListState extends State<PeopleNearMeList> {
 
   String _chosenDistance = '2000';
 
+  final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  StreamSubscription<Position>? _positionStreamSubscription;
+
   _scrollListener() {
     if (_scrollController.offset >=
             _scrollController.position.maxScrollExtent &&
@@ -27,12 +35,29 @@ class _MomentListState extends State<PeopleNearMeList> {
     }
   }
 
+  _updateCurrentLocation() {
+    final location = _geolocatorPlatform.getPositionStream(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeInterval: 3000,
+        timeLimit: Duration(hours: 1)
+    );
+
+    _positionStreamSubscription = location.handleError((error) {
+      _positionStreamSubscription?.cancel();
+      _positionStreamSubscription = null;
+    }).listen((position) async {
+      await updateCustomerLocation(position);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     setState(() {
       loading = true;
     });
+
+    _updateCurrentLocation();
     // Retrieve first
     _retrievePeople(1, isRefresh: true);
 
@@ -212,6 +237,10 @@ class _MomentListState extends State<PeopleNearMeList> {
 
   @override
   void dispose() {
+    if (_positionStreamSubscription != null) {
+      _positionStreamSubscription!.cancel();
+      _positionStreamSubscription = null;
+    }
     _scrollController.dispose();
     super.dispose();
   }

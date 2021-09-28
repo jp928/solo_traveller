@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:connectycube_sdk/connectycube_sdk.dart';
+import 'package:solo_traveller/widgets/avatar_text.dart';
 
 class ChatDialogScreen extends StatelessWidget {
   final CubeUser _cubeUser;
@@ -15,12 +16,19 @@ class ChatDialogScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffe9ecef),
       appBar: AppBar(
         title: Text(
           _cubeDialog.name != null ? _cubeDialog.name! : '',
+          style: TextStyle(
+            color: Color(0xff4A4A4A),
+          )
         ),
-
-        centerTitle: false,
+        iconTheme: IconThemeData(
+          color: Color.fromRGBO(74, 90, 247, 1), //change your color here
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
         actions: <Widget>[
           IconButton(
             onPressed: () {
@@ -34,10 +42,7 @@ class ChatDialogScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        top: false,
-        child: ChatScreen(_cubeUser, _cubeDialog)
-      ),
+      body: SafeArea(top: false, child: ChatScreen(_cubeUser, _cubeDialog)),
     );
   }
 }
@@ -83,8 +88,6 @@ class ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _initCubeChat();
-    log('=====>>>>>');
-    log(this._cubeDialog.toString());
     isLoading = false;
     imageUrl = '';
   }
@@ -148,7 +151,6 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   void onTypingMessage(TypingStatus status) {
-    log("TypingStatus message= ${status.userId}");
     if (status.userId == _cubeUser.id ||
         (status.dialogId != null && status.dialogId != _cubeDialog.dialogId))
       return;
@@ -209,11 +211,6 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   void onSendMessage(CubeMessage message) async {
-    log("onSendMessage message= $message");
-    log(_cubeDialog.toString());
-
-    log("======================");
-    log(_cubeUser.id.toString());
     textEditingController.clear();
     await _cubeDialog.sendMessage(message);
     message.senderId = _cubeUser.id;
@@ -226,8 +223,8 @@ class ChatScreenState extends State<ChatScreen> {
   updateReadDeliveredStatusMessage(MessageStatus status, bool isRead) {
     log('[updateReadDeliveredStatusMessage]');
     setState(() {
-      CubeMessage? msg = listMessage!.firstWhereOrNull(
-              (msg) => msg.messageId == status.messageId);
+      CubeMessage? msg = listMessage!
+          .firstWhereOrNull((msg) => msg.messageId == status.messageId);
       if (msg == null) return;
       if (isRead)
         msg.readIds == null
@@ -305,7 +302,6 @@ class ChatScreenState extends State<ChatScreen> {
     }
 
     Widget getReadDeliveredWidget() {
-      log("[getReadDeliveredWidget]");
       bool messageIsRead() {
         log("[getReadDeliveredWidget] messageIsRead");
         if (_cubeDialog.type == CubeDialogType.PRIVATE)
@@ -313,7 +309,8 @@ class ChatScreenState extends State<ChatScreen> {
               (message.recipientId == null ||
                   message.readIds!.contains(message.recipientId));
         return message.readIds != null &&
-            message.readIds!.any((int id) => id != _cubeUser.id && _occupants.keys.contains(id));
+            message.readIds!.any(
+                (int id) => id != _cubeUser.id && _occupants.keys.contains(id));
       }
 
       bool messageIsDelivered() {
@@ -321,7 +318,8 @@ class ChatScreenState extends State<ChatScreen> {
         if (_cubeDialog.type == CubeDialogType.PRIVATE)
           return message.deliveredIds?.contains(message.recipientId) ?? false;
         return message.deliveredIds != null &&
-            message.deliveredIds!.any((int id) => id != _cubeUser.id && _occupants.keys.contains(id));
+            message.deliveredIds!.any(
+                (int id) => id != _cubeUser.id && _occupants.keys.contains(id));
       }
 
       if (messageIsRead()) {
@@ -411,106 +409,108 @@ class ChatScreenState extends State<ChatScreen> {
           Row(
             children: <Widget>[
               message.attachments?.isNotEmpty ?? false
-              // Image
+                  // Image
                   ? Container(
-                child: TextButton(
-                  child: Material(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // CachedNetworkImage(
-                          //   placeholder: (context, url) => Container(
-                          //     child: CircularProgressIndicator(
-                          //       valueColor: AlwaysStoppedAnimation<Color>(
-                          //           Color(0xfff5a623)),
-                          //     ),
-                          //     width: 200.0,
-                          //     height: 200.0,
-                          //     padding: EdgeInsets.all(70.0),
-                          //     decoration: BoxDecoration(
-                          //       color: Colors.grey,
-                          //       borderRadius: BorderRadius.all(
-                          //         Radius.circular(8.0),
-                          //       ),
-                          //     ),
-                          //   ),
-                          //   errorWidget: (context, url, error) =>
-                          //       Material(
-                          //         child: Image.asset(
-                          //           'images/img_not_available.jpeg',
-                          //           width: 200.0,
-                          //           height: 200.0,
-                          //           fit: BoxFit.cover,
-                          //         ),
-                          //         borderRadius: BorderRadius.all(
-                          //           Radius.circular(8.0),
-                          //         ),
-                          //         clipBehavior: Clip.hardEdge,
-                          //       ),
-                          //   imageUrl: message.attachments!.first.url!,
-                          //   width: 200.0,
-                          //   height: 200.0,
-                          //   fit: BoxFit.cover,
-                          // ),
-                          getDateWidget(),
-                          getReadDeliveredWidget(),
-                        ]),
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ),
-                  onPressed: () {
-                    log('=+++++++');
-                  //   Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //           builder: (context) => FullPhoto(
-                  //               url: message.attachments!.first.url!)));
-                  },
-                ),
-                margin: EdgeInsets.only(
-                    bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                    right: 10.0),
-              )
-                  : message.body != null && message.body!.isNotEmpty
-              // Text
-                  ? Flexible(
-                child: Container(
-                  padding:
-                  EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-
-                        // Message body
-                        Text(
-                          message.body!,
-                          style: TextStyle(color: Colors.red),
+                      child: TextButton(
+                        child: Material(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                // CachedNetworkImage(
+                                //   placeholder: (context, url) => Container(
+                                //     child: CircularProgressIndicator(
+                                //       valueColor: AlwaysStoppedAnimation<Color>(
+                                //           Color(0xfff5a623)),
+                                //     ),
+                                //     width: 200.0,
+                                //     height: 200.0,
+                                //     padding: EdgeInsets.all(70.0),
+                                //     decoration: BoxDecoration(
+                                //       color: Colors.grey,
+                                //       borderRadius: BorderRadius.all(
+                                //         Radius.circular(8.0),
+                                //       ),
+                                //     ),
+                                //   ),
+                                //   errorWidget: (context, url, error) =>
+                                //       Material(
+                                //         child: Image.asset(
+                                //           'images/img_not_available.jpeg',
+                                //           width: 200.0,
+                                //           height: 200.0,
+                                //           fit: BoxFit.cover,
+                                //         ),
+                                //         borderRadius: BorderRadius.all(
+                                //           Radius.circular(8.0),
+                                //         ),
+                                //         clipBehavior: Clip.hardEdge,
+                                //       ),
+                                //   imageUrl: message.attachments!.first.url!,
+                                //   width: 200.0,
+                                //   height: 200.0,
+                                //   fit: BoxFit.cover,
+                                // ),
+                                getDateWidget(),
+                                getReadDeliveredWidget(),
+                              ]),
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          clipBehavior: Clip.hardEdge,
                         ),
-                        getDateWidget(),
-                        getReadDeliveredWidget(),
-                      ]),
-                ),
-              )
-                  : Container(
-                child: Text(
-                  "Empty",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                width: 200.0,
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(8.0)),
-                margin: EdgeInsets.only(
-                    bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                    right: 10.0),
-              ),
+                        onPressed: () {
+                          //   Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //           builder: (context) => FullPhoto(
+                          //               url: message.attachments!.first.url!)));
+                        },
+                      ),
+                      margin: EdgeInsets.only(
+                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                          right: 10.0),
+                    )
+                  : message.body != null && message.body!.isNotEmpty
+                      // Text
+                      ? Flexible(
+                          child: Column(
+                            // mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding:
+                                EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                margin: EdgeInsets.only(
+                                    bottom: 5,
+                                ),
+                                child: Text(
+                                  message.body!,
+                                  style: TextStyle(color: Color(0xff404040)),
+                                )
+                              ),
+                              getDateWidget(),
+                              // getReadDeliveredWidget(),
+                              Padding(
+                                padding: EdgeInsets.only(bottom: isLastMessageRight(index) ? 10.0 : 5.0,),
+                              )
+                            ],
+                          ),
+                        )
+                      : Container(
+                          child: Text(
+                            "Empty",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                          width: 200.0,
+                          decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8.0)),
+                          margin: EdgeInsets.only(
+                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                              right: 10.0),
+                        ),
             ],
             mainAxisAlignment: MainAxisAlignment.end,
           ),
@@ -524,125 +524,126 @@ class ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             isHeaderView() ? getHeaderDateWidget() : SizedBox.shrink(),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Material(
                   child: CircleAvatar(
-                    backgroundImage:
-                    _occupants[message.senderId]?.avatar != null &&
-                        _occupants[message.senderId]!.avatar!.isNotEmpty
+                    backgroundImage: _occupants[message.senderId]?.avatar !=
+                                null &&
+                            _occupants[message.senderId]!.avatar!.isNotEmpty
                         ? NetworkImage(_occupants[message.senderId]!.avatar!)
                         : null,
-                    backgroundColor: Colors.grey,
-                    radius: 30,
-                    child: Text('Hi'),
-                    // child: getAvatarTextWidget(
-                    //   _occupants[message.senderId]?.avatar != null &&
-                    //       _occupants[message.senderId]!.avatar!.isNotEmpty,
-                    //   _occupants[message.senderId]
-                    //       ?.fullName
-                    //       ?.substring(0, 2)
-                    //       .toUpperCase(),
-                    // ),
+                    backgroundColor: Colors.transparent,
+                    radius: 24,
+                    child: AavatarText(
+                      condition: false,
+                      // _occupants[message.senderId]?.avatar != null &&
+                      //     _occupants[message.senderId]!.avatar!.isNotEmpty,
+                      text: _occupants[message.senderId]
+                          ?.fullName
+                          ?.substring(0, 2)
+                          .toUpperCase(),
+                    ),
                   ),
                   borderRadius: BorderRadius.all(
-                    Radius.circular(18.0),
+                    Radius.circular(24),
                   ),
                   clipBehavior: Clip.hardEdge,
                 ),
                 message.attachments?.isNotEmpty ?? false
                     ? Container(
-                  child: TextButton(
-                    child: Material(
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // CachedNetworkImage(
-                            //   placeholder: (context, url) => Container(
-                            //     child: CircularProgressIndicator(
-                            //       valueColor:
-                            //       AlwaysStoppedAnimation<Color>(
-                            //           Color(0xfff5a623)),
-                            //     ),
-                            //     width: 200.0,
-                            //     height: 200.0,
-                            //     padding: EdgeInsets.all(70.0),
-                            //     decoration: BoxDecoration(
-                            //       color: Colors.grey,
-                            //       borderRadius: BorderRadius.all(
-                            //         Radius.circular(8.0),
-                            //       ),
-                            //     ),
-                            //   ),
-                            //   errorWidget: (context, url, error) =>
-                            //       Material(
-                            //         child: Image.asset(
-                            //           'images/img_not_available.jpeg',
-                            //           width: 200.0,
-                            //           height: 200.0,
-                            //           fit: BoxFit.cover,
-                            //         ),
-                            //         borderRadius: BorderRadius.all(
-                            //           Radius.circular(8.0),
-                            //         ),
-                            //         clipBehavior: Clip.hardEdge,
-                            //       ),
-                            //   imageUrl: message.attachments!.first.url!,
-                            //   width: 200.0,
-                            //   height: 200.0,
-                            //   fit: BoxFit.cover,
-                            // ),
-                            getDateWidget(),
-                          ]),
-                      borderRadius:
-                      BorderRadius.all(Radius.circular(8.0)),
-                      clipBehavior: Clip.hardEdge,
-                    ),
-                    onPressed: () {
-                      log("======>>>>");
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => FullPhoto(
-                      //             url: message.attachments!.first.url!)));
-                    },
-                  ),
-                  margin: EdgeInsets.only(left: 10.0),
-                )
-                    : message.body != null && message.body!.isNotEmpty
-                    ? Flexible(
-                  child: Container(
-                    padding:
-                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                    decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(8.0)),
-                    margin: EdgeInsets.only(left: 10.0),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            message.body!,
-                            style: TextStyle(color: Colors.white),
+                        child: TextButton(
+                          child: Material(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // CachedNetworkImage(
+                                  //   placeholder: (context, url) => Container(
+                                  //     child: CircularProgressIndicator(
+                                  //       valueColor:
+                                  //       AlwaysStoppedAnimation<Color>(
+                                  //           Color(0xfff5a623)),
+                                  //     ),
+                                  //     width: 200.0,
+                                  //     height: 200.0,
+                                  //     padding: EdgeInsets.all(70.0),
+                                  //     decoration: BoxDecoration(
+                                  //       color: Colors.grey,
+                                  //       borderRadius: BorderRadius.all(
+                                  //         Radius.circular(8.0),
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  //   errorWidget: (context, url, error) =>
+                                  //       Material(
+                                  //         child: Image.asset(
+                                  //           'images/img_not_available.jpeg',
+                                  //           width: 200.0,
+                                  //           height: 200.0,
+                                  //           fit: BoxFit.cover,
+                                  //         ),
+                                  //         borderRadius: BorderRadius.all(
+                                  //           Radius.circular(8.0),
+                                  //         ),
+                                  //         clipBehavior: Clip.hardEdge,
+                                  //       ),
+                                  //   imageUrl: message.attachments!.first.url!,
+                                  //   width: 200.0,
+                                  //   height: 200.0,
+                                  //   fit: BoxFit.cover,
+                                  // ),
+                                  getDateWidget(),
+                                ]),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            clipBehavior: Clip.hardEdge,
                           ),
-                          getDateWidget(),
-                        ]),
-                  ),
-                )
-                    : Container(
-                  child: Text(
-                    "Empty",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  padding:
-                  EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  width: 200.0,
-                  decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
-                ),
+                          onPressed: () {
+                            log("======>>>>");
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => FullPhoto(
+                            //             url: message.attachments!.first.url!)));
+                          },
+                        ),
+                        margin: EdgeInsets.only(left: 10.0),
+                      )
+                    : message.body != null && message.body!.isNotEmpty
+                        ? Flexible(
+                            child: Column(
+                              children: [
+                                Container(
+                                    padding:
+                                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                                    decoration: BoxDecoration(
+                                        color: Color(0xff718CFB),
+                                        borderRadius: BorderRadius.circular(8.0)),
+                                    margin: EdgeInsets.only(left: 10.0, bottom: 5),
+                                    child: Text(
+                                      message.body!,
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                ),
+                                getDateWidget()
+                              ],
+                            )
+                          )
+                        : Container(
+                            child: Text(
+                              "Empty",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            padding:
+                                EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                            width: 200.0,
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8.0)),
+                            margin: EdgeInsets.only(
+                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                                right: 10.0),
+                          ),
               ],
             ),
           ],
@@ -655,8 +656,8 @@ class ChatScreenState extends State<ChatScreen> {
 
   bool isLastMessageLeft(int index) {
     if ((index > 0 &&
-        listMessage != null &&
-        listMessage![index - 1].id == _cubeUser.id) ||
+            listMessage != null &&
+            listMessage![index - 1].id == _cubeUser.id) ||
         index == 0) {
       return true;
     } else {
@@ -666,8 +667,8 @@ class ChatScreenState extends State<ChatScreen> {
 
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
-        listMessage != null &&
-        listMessage![index - 1].id != _cubeUser.id) ||
+            listMessage != null &&
+            listMessage![index - 1].id != _cubeUser.id) ||
         index == 0) {
       return true;
     } else {
@@ -776,7 +777,8 @@ class ChatScreenState extends State<ChatScreen> {
           if (!snapshot.hasData) {
             return Center(
                 child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff5a623))));
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Color(0xfff5a623))));
           } else {
             listMessage = snapshot.data as List<CubeMessage>;
             return getWidgetMessages(listMessage);

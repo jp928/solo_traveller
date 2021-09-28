@@ -88,9 +88,10 @@ class LoginScreen extends StatelessWidget {
     );
 
     bool result = false;
+    MyCubeUser user = context.read<MyCubeUser>();
+
     try {
       var email = _emailController.text;
-      MyCubeUser user = context.read<MyCubeUser>();
       user.setEmail(email);
 
       await createConnectyCubeSession(context, withSignUp: false);
@@ -98,6 +99,7 @@ class LoginScreen extends StatelessWidget {
 
     } on Exception catch (e) {
       Navigator.pop(context);
+      user.setEmail('');
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
