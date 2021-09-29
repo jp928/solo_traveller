@@ -106,8 +106,10 @@ class _EditMyProfileScreenState extends State<EditMyProfileScreen> {
         _cUser = await createConnectyCubeSession(context);
       }
 
+      String? profileImgUrl;
       if (_image != null) {
-        await uploadProfileImage(File(_image!.path), context);
+        profileImgUrl = await uploadProfileImage(File(_image!.path), context);
+        user.setProfileImage(profileImgUrl);
       }
 
       Profile profile = Profile(
@@ -116,6 +118,7 @@ class _EditMyProfileScreenState extends State<EditMyProfileScreen> {
         _country!.countryCode,
         _cUser!.id.toString(),
         _aboutController.text, // about
+        profileImgUrl,
       );
       result = await updateProfile(profile);
     } on Exception catch (e) {
@@ -137,8 +140,6 @@ class _EditMyProfileScreenState extends State<EditMyProfileScreen> {
                 ],
               ));
     }
-
-    Navigator.pop(context);
 
     // If success
     if (result) {

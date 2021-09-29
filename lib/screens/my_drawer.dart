@@ -15,7 +15,7 @@ class MyDrawer extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  void _logout(BuildContext context) async {
+  Future<void> _logout(BuildContext context) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     await secureStorage.deleteAll();
 
@@ -126,8 +126,8 @@ class MyDrawer extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.logout),
                     title: const Text('Logout'),
-                    onTap: (){
-                      _logout(context);
+                    onTap: () async {
+                      await _logout(context);
                     },
                   ),
                 ],

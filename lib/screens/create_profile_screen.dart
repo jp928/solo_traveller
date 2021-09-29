@@ -106,8 +106,9 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         _cUser = await createConnectyCubeSession(context);
       }
 
+      String? profileImgUrl;
       if (_image != null) {
-        await uploadProfileImage(File(_image!.path), context);
+        profileImgUrl = await uploadProfileImage(File(_image!.path), context);
       }
 
       Profile profile = Profile(
@@ -116,6 +117,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         _country!.countryCode,
         _cUser!.id.toString(),
         _aboutController.text, // about
+        profileImgUrl,
         Settings(
           _currentRangeValues.start.toInt(),
           _currentRangeValues.end.toInt(),

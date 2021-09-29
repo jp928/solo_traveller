@@ -12,6 +12,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['countryCode'] as String?,
       json['chatAccountId'] as String?,
       json['about'] as String?,
+      json['profileImage'] as String?,
       json['settings'] == null
           ? null
           : Settings.fromJson(json['settings'] as Map<String, dynamic>),
@@ -20,20 +21,28 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['followingCount'] as int? ?? 0,
       (json['interests'] as List<dynamic>?)?.map((e) => e as String?).toList(),
       json['gender'] as String?,
-      json['profileImage'] as String?,
     );
 
-Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
-      'settings': instance.settings?.toJson(),
-      'firstName': instance.firstName,
-      'dateOfBirth': instance.dateOfBirth,
-      'chatAccountId': instance.chatAccountId,
-      'countryCode': instance.countryCode,
-      'about': instance.about,
-      'momentCount': instance.momentCount,
-      'followerCount': instance.followerCount,
-      'followingCount': instance.followingCount,
-      'interests': instance.interests,
-      'gender': instance.gender,
-      'profileImage': instance.profileImage,
-    };
+Map<String, dynamic> _$ProfileToJson(Profile instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('settings', instance.settings?.toJson());
+  val['firstName'] = instance.firstName;
+  val['dateOfBirth'] = instance.dateOfBirth;
+  writeNotNull('chatAccountId', instance.chatAccountId);
+  writeNotNull('countryCode', instance.countryCode);
+  writeNotNull('about', instance.about);
+  val['momentCount'] = instance.momentCount;
+  val['followerCount'] = instance.followerCount;
+  val['followingCount'] = instance.followingCount;
+  writeNotNull('interests', instance.interests);
+  writeNotNull('gender', instance.gender);
+  writeNotNull('profileImage', instance.profileImage);
+  return val;
+}

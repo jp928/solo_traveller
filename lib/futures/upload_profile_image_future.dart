@@ -14,7 +14,7 @@ import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
 
-Future<bool> uploadProfileImage(File image, BuildContext context) async {
+Future<String> uploadProfileImage(File image, BuildContext context) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
 
@@ -56,7 +56,7 @@ Future<bool> uploadProfileImage(File image, BuildContext context) async {
       });
     }
 
-    return true;
+    return profileImage['url'];
   } else {
     var message = 'Failed';
 

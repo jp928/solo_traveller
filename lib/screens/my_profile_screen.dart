@@ -136,7 +136,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _profile?.profileImage == null ?
+                  person.profileImage == null ?
                   Icon(
                     Icons.person,
                     size: 32,
@@ -144,7 +144,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ):
                   ClipRRect(
                     borderRadius: BorderRadius.circular(32),
-                    child: Image.network(_profile!.profileImage!,
+                    child: Image.network(person.profileImage!,
                         height: 64, width: 64, fit: BoxFit.cover),
                   ),
                   Padding(

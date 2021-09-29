@@ -8,6 +8,7 @@ import 'package:solo_traveller/models/profile.dart';
 Future<bool> updateProfile(Profile profile) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
+
   final response = await http.put(
     Uri.parse('https://solodevelopment.tk/account/update_profile'),
     headers: <String, String>{
