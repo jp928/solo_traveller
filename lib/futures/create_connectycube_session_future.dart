@@ -29,14 +29,21 @@ Future<CubeUser?> createConnectyCubeSession(
   myCubeUser.setUser(user);
   user.password = myCubeUser.email;
 
-  await CubeChatConnection.instance.login(user).onError((error, stackTrace) {
-    throw Exception(error.toString());
-  });
+  if (CubeSessionManager.instance.isActiveSessionValid() &&
+      CubeSessionManager.instance.activeSession?.userId != null &&
+      CubeSessionManager.instance.activeSession?.userId == user.id) {
+     CubeChatConnection.instance.login(user).catchError((error) {
+      throw Exception(error.toString());
+    });
 
-  final session = await createSession(user).onError((error, stackTrace) {
-    throw Exception(error.toString());
-  });
-  context.read<MyCubeSession>().setSession(session);
+    return CubeSessionManager.instance.activeSession!.user;
+  } else {
+    final session = await createSession(user);
+     CubeChatConnection.instance.login(user).catchError((error) {
+      throw Exception(error.toString());
+    });
+    context.read<MyCubeSession>().setSession(session);
 
-  return session.user;
+    return session.user;
+  }
 }

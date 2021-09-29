@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/src/provider.dart';
+import 'package:solo_traveller/providers/my_cube_session.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
 import 'package:solo_traveller/screens/my_profile_screen.dart';
@@ -26,6 +27,7 @@ class MyDrawer extends StatelessWidget {
     cubeUser.setUser(null);
 
     await signOut();
+    await deleteSession();
 
     Navigator.pushAndRemoveUntil(
       context,

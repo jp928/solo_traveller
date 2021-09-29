@@ -216,8 +216,12 @@ class ChatScreenState extends State<ChatScreen> {
 
   void onSendMessage(CubeMessage message) async {
     textEditingController.clear();
-    await _cubeDialog.sendMessage(message);
+
     message.senderId = _cubeUser.id;
+    await _cubeDialog.sendMessage(message).onError((error, stackTrace) {
+      log(error.toString());
+      return message;
+    });
 
     addMessageToListView(message);
     listScrollController.animateTo(0.0,
@@ -473,13 +477,14 @@ class ChatScreenState extends State<ChatScreen> {
                     backgroundColor: Colors.transparent,
                     radius: 24,
                     child: AavatarText(
-                      condition: false,
-                      // _occupants[message.senderId]?.avatar != null &&
-                      //     _occupants[message.senderId]!.avatar!.isNotEmpty,
+                      condition: _occupants[message.senderId]?.avatar != null &&
+                          _occupants[message.senderId]!.avatar!.isNotEmpty,
                       text: _occupants[message.senderId]
                           ?.fullName
                           ?.substring(0, 2)
                           .toUpperCase(),
+                      
+                      image: getPrivateUrlForUid(_occupants[message.senderId]!.avatar)
                     ),
                   ),
                   borderRadius: BorderRadius.all(
@@ -767,34 +772,38 @@ class ChatScreenState extends State<ChatScreen> {
         .listen(onTypingMessage);
   }
 
-  void _initCubeChat() {
-    log("_initCubeChat");
+  void _initCubeChat() async {
     if (CubeChatConnection.instance.isAuthenticated()) {
       log("[_initCubeChat] isAuthenticated");
       _initChatListeners();
     } else {
       log("[_initCubeChat] not authenticated");
-      CubeChatConnection.instance.connectionStateStream.listen((state) {
-        log("[_initCubeChat] state $state");
-        if (CubeChatConnectionState.Ready == state) {
-          _initChatListeners();
-
-          if (_unreadMessages.isNotEmpty) {
-            _unreadMessages.forEach((cubeMessage) {
-              _cubeDialog.readMessage(cubeMessage);
-            });
-            _unreadMessages.clear();
-          }
-
-          if (_unsentMessages.isNotEmpty) {
-            _unsentMessages.forEach((cubeMessage) {
-              _cubeDialog.sendMessage(cubeMessage);
-            });
-
-            _unsentMessages.clear();
-          }
-        }
+      CubeChatConnection.instance.login(_cubeUser).catchError((error) {
+        log(error.toString());
       });
+
+
+      // CubeChatConnection.instance.connectionStateStream.listen((state) {
+      //   log("[_initCubeChat] state $state");
+      //   if (CubeChatConnectionState.Ready == state) {
+      //     _initChatListeners();
+      //
+      //     if (_unreadMessages.isNotEmpty) {
+      //       _unreadMessages.forEach((cubeMessage) {
+      //         _cubeDialog.readMessage(cubeMessage);
+      //       });
+      //       _unreadMessages.clear();
+      //     }
+      //
+      //     if (_unsentMessages.isNotEmpty) {
+      //       _unsentMessages.forEach((cubeMessage) {
+      //         _cubeDialog.sendMessage(cubeMessage);
+      //       });
+      //
+      //       _unsentMessages.clear();
+      //     }
+      //   }
+      // });
     }
   }
 }

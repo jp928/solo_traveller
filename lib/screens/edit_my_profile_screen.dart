@@ -102,9 +102,6 @@ class _EditMyProfileScreenState extends State<EditMyProfileScreen> {
       MyCubeUser user = context.read<MyCubeUser>();
       user.setName(_firstNameController.text);
       CubeUser? _cUser = user.user;
-      if (_cUser == null) {
-        _cUser = await createConnectyCubeSession(context);
-      }
 
       String? profileImgUrl;
       if (_image != null) {

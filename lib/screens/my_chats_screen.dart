@@ -1,5 +1,6 @@
 import 'package:connectycube_sdk/connectycube_calls.dart';
 import 'package:connectycube_sdk/connectycube_chat.dart';
+import 'package:connectycube_sdk/connectycube_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
@@ -49,17 +50,22 @@ class _MyChatsScreenState extends State<MyChatsScreen> {
           ));
     }
 
+    MyCubeUser user = context.read<MyCubeUser>();
+    int? myCubeUserId = user.user?.id;
+
+
     var futureList = dialogs.items.map<Future<Map<String, dynamic>>>((item) async {
-      CubeUser? participant = await _getParticipant(item);
+      CubeUser? participant = await _getParticipant(item, myCubeUserId);
+      String short = timeago.format(item.updatedAt, locale: 'en_short');
       String? lastUpdate =  item.updatedAt == null
         ?
         null
         :
-        '${timeago.format(item.updatedAt, locale: 'en_short')} ago';
+      (short == 'now' ) ? short : '$short ago';
 
       return {
         'dialog': item,
-        'avatar': participant?.avatar,
+        'avatar': getPrivateUrlForUid(participant?.avatar),
         'participantName': participant?.fullName,
         'lastMessage': item.lastMessage,
         'lastUpdate': lastUpdate
@@ -76,9 +82,9 @@ class _MyChatsScreenState extends State<MyChatsScreen> {
     }
   }
 
-  Future<CubeUser?> _getParticipant(CubeDialog dialog) async {
+  Future<CubeUser?> _getParticipant(CubeDialog dialog, int? myCubeUserId) async {
     List<int> participants = dialog.occupantsIds!;
-    participants.remove(dialog.userId);
+    participants.remove(myCubeUserId);
     return getUserById(participants.first);
   }
 
