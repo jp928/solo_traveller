@@ -141,6 +141,9 @@ class _EditMyProfileScreenState extends State<EditMyProfileScreen> {
     // If success
     if (result) {
       Navigator.pop(context);
+
+      // Go back to previous screen
+      Navigator.of(context).pop();
     }
   }
 

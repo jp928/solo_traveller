@@ -72,11 +72,11 @@ class _MomentListState extends State<MomentList> {
   void _createPost() async {
     bool _createPostSuccess = false;
 
-    await showDialog(
+    showDialog(
         context: context,
         builder: (BuildContext context) {
           return Center(child: CircularProgressIndicator());
-        });
+    });
 
     var body = _postTextController.text;
     try {
@@ -115,6 +115,8 @@ class _MomentListState extends State<MomentList> {
   _imgFromCamera() async {
     XFile? image = await _picker.pickImage(
       source: ImageSource.camera,
+      maxWidth: 512,
+      maxHeight: 512,
     );
 
     setState(() {
@@ -125,6 +127,8 @@ class _MomentListState extends State<MomentList> {
   _imgFromGallery() async {
     XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
     );
 
     setState(() {
