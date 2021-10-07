@@ -33,9 +33,6 @@ Future<bool> auth(String email, String password) async {
       Map<String, dynamic> data = jsonDecode(response.body);
       message = data['message'] ?? 'Failed';
     }
-
-    // If the server did not return a 201 CREATED response,
-    // then throw an exception.
     throw Exception(message);
   }
 }

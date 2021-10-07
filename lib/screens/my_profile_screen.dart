@@ -87,44 +87,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_profile?.chatAccountId == null) {
-            showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Failed'),
-                  content: Text('Can\'t chat with this user.'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                )
-            );
-          } else {
-            MyCubeUser myCubeUser = context.read<MyCubeUser>();
-
-            CubeDialog newDialog = CubeDialog(CubeDialogType.PRIVATE, occupantsIds: [
-              int.parse(_profile?.chatAccountId ?? '0')
-            ]);
-            createDialog(newDialog).then((createdDialog) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatDialogScreen(myCubeUser.user!, createdDialog),
-                ),
-              );
-            });
-          }
-
-          // Add your onPressed code here!
-        },
-        // label: const Text('Approve'),
-        child: const Icon(Icons.chat),
-        backgroundColor: Color(0xff718CFB),
-      ),
       body: Container(
         // Set background to blue to emphasize that it's a new route.
         // color: Colors.lightBlueAccent,
@@ -229,12 +191,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((_profile?.followerCount ?? 0).toString(),
-                                  style: TextStyle(
-                                      color: Color(0xff718CFB), fontSize: 16)),
-                              Text('FOLLOWERS',
-                                  style: GoogleFonts.getFont('Source Sans Pro',
-                                      color: Color(0xff4A4A4A)))
+                              // Text((_profile?.followerCount ?? 0).toString(),
+                              //     style: TextStyle(
+                              //         color: Color(0xff718CFB), fontSize: 16)),
+                              // Text('FOLLOWERS',
+                              //     style: GoogleFonts.getFont('Source Sans Pro',
+                              //         color: Color(0xff4A4A4A)))
                             ],
                           )),
                       Container(
@@ -243,12 +205,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((_profile?.followingCount ?? 0).toString(),
-                                  style: TextStyle(
-                                      color: Color(0xff718CFB), fontSize: 16)),
-                              Text('FOLLOWING',
-                                  style: GoogleFonts.getFont('Source Sans Pro',
-                                      color: Color(0xff4A4A4A)))
+                              // Text((_profile?.followingCount ?? 0).toString(),
+                              //     style: TextStyle(
+                              //         color: Color(0xff718CFB), fontSize: 16)),
+                              // Text('FOLLOWING',
+                              //     style: GoogleFonts.getFont('Source Sans Pro',
+                              //         color: Color(0xff4A4A4A)))
                             ],
                           )
                       ),

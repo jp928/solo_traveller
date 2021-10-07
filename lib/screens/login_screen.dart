@@ -107,7 +107,7 @@ class LoginScreen extends StatelessWidget {
     } on Exception catch (e) {
       Navigator.pop(context);
       user.setEmail('');
-      showDialog<String>(
+      await showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: const Text('Failed'),
@@ -124,6 +124,8 @@ class LoginScreen extends StatelessWidget {
           ],
         )
       );
+
+      return;
     }
 
     Navigator.pop(context);

@@ -73,9 +73,10 @@ class PostItem extends StatelessWidget {
           ),
         ),
         subtitle: post.imageUrl == null ? null : Container(
-          // width: MediaQuery.of(context).size.width * 0.45,
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Image(
+            fit: BoxFit.fitWidth,
+            width: MediaQuery.of(context).size.width - 64,
             image: NetworkImage(
                 post.imageUrl!
             ),

@@ -72,7 +72,7 @@ class _MomentListState extends State<MomentList> {
   void _createPost() async {
     bool _createPostSuccess = false;
 
-    showDialog(
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return Center(child: CircularProgressIndicator());
@@ -86,7 +86,7 @@ class _MomentListState extends State<MomentList> {
         _createPostSuccess = await createPost(body, null, null, null, null);
       }
     } on Exception catch (e) {
-      showDialog<String>(
+      await showDialog<String>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
                 title: const Text('Failed'),
@@ -115,9 +115,6 @@ class _MomentListState extends State<MomentList> {
   _imgFromCamera() async {
     XFile? image = await _picker.pickImage(
       source: ImageSource.camera,
-      // imageQuality: 50,
-      maxHeight: 200,
-      maxWidth: 200,
     );
 
     setState(() {
@@ -128,9 +125,6 @@ class _MomentListState extends State<MomentList> {
   _imgFromGallery() async {
     XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
-      // imageQuality: 50,
-      maxHeight: 200,
-      maxWidth: 200,
     );
 
     setState(() {

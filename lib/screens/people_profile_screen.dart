@@ -232,12 +232,12 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((_profile?.followerCount ?? 0).toString(),
-                                  style: TextStyle(
-                                      color: Color(0xff718CFB), fontSize: 16)),
-                              Text('FOLLOWERS',
-                                  style: GoogleFonts.getFont('Source Sans Pro',
-                                      color: Color(0xff4A4A4A)))
+                              // Text((_profile?.followerCount ?? 0).toString(),
+                              //     style: TextStyle(
+                              //         color: Color(0xff718CFB), fontSize: 16)),
+                              // Text('FOLLOWERS',
+                              //     style: GoogleFonts.getFont('Source Sans Pro',
+                              //         color: Color(0xff4A4A4A)))
                             ],
                           )),
                       Container(
@@ -246,12 +246,12 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((_profile?.followingCount ?? 0).toString(),
-                                  style: TextStyle(
-                                      color: Color(0xff718CFB), fontSize: 16)),
-                              Text('FOLLOWING',
-                                  style: GoogleFonts.getFont('Source Sans Pro',
-                                      color: Color(0xff4A4A4A)))
+                              // Text((_profile?.followingCount ?? 0).toString(),
+                              //     style: TextStyle(
+                              //         color: Color(0xff718CFB), fontSize: 16)),
+                              // Text('FOLLOWING',
+                              //     style: GoogleFonts.getFont('Source Sans Pro',
+                              //         color: Color(0xff4A4A4A)))
                             ],
                           )
                       ),
