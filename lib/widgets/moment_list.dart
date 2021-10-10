@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:solo_traveller/futures/create_post_future.dart';
@@ -6,6 +7,8 @@ import 'package:solo_traveller/futures/get_posts_future.dart';
 import 'package:solo_traveller/futures/upload_moment_image_future.dart';
 import 'package:solo_traveller/models/post.dart';
 import 'package:solo_traveller/widgets/post_item.dart';
+
+import 'my_special_text_span_builder.dart';
 
 class MomentList extends StatefulWidget {
   @override
@@ -76,7 +79,7 @@ class _MomentListState extends State<MomentList> {
         context: context,
         builder: (BuildContext context) {
           return Center(child: CircularProgressIndicator());
-    });
+        });
 
     var body = _postTextController.text;
     try {
@@ -249,17 +252,48 @@ class _MomentListState extends State<MomentList> {
                       width: 8,
                     ),
                     Expanded(
-                      child: TextField(
-                        controller: _postTextController,
-                        maxLines: 15,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Type a message',
-                          hintStyle: TextStyle(color: Colors.black54),
-                          border: InputBorder.none,
-                        ),
+                      child:
+                          // TextField(
+                          //   controller: _postTextController,
+                          //   maxLines: 15,
+                          //   style: TextStyle(
+                          //     fontSize: 14.0,
+                          //   ),
+                          //   decoration: InputDecoration(
+                          //     hintText: 'Type a message',
+                          //     hintStyle: TextStyle(color: Colors.black54),
+                          //     border: InputBorder.none,
+                          //   ),
+                          // ),
+                          ExtendedTextField(
+                            expands: true,
+                        // specialTextSpanBuilder: MySpecialTextSpanBuilder(),
+                            controller: _postTextController,
+                        // selectionControls: _myExtendedMaterialTextSelectionControls,
+                            maxLines: null,
+                            // decoration: InputDecoration(
+                            //     border: OutlineInputBorder(borderSide: BorderSide(color: Color.fromRGBO(74, 90, 247, 1), width: 1))
+                            // ),
+
+                            // focusNode: _focusNode,
+                        // decoration: InputDecoration(
+                        //     suffixIcon: GestureDetector(
+                        //       onTap: () {
+                        //         setState(() {
+                        //           sessions.insert(0, _textEditingController.text);
+                        //           _textEditingController.value =
+                        //               _textEditingController.value.copyWith(
+                        //                   text: '',
+                        //                   selection:
+                        //                       const TextSelection.collapsed(offset: 0),
+                        //                   composing: TextRange.empty);
+                        //         });
+                        //       },
+                        //       child: const Icon(Icons.send),
+                        //     ),
+                        //     contentPadding: const EdgeInsets.all(12.0)
+                        //   ),
+                        //textDirection: TextDirection.rtl,
                       ),
                     ),
                     SizedBox(
