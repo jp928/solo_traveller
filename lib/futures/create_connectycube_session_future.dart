@@ -8,7 +8,7 @@ import 'package:solo_traveller/providers/my_cube_user.dart';
 Future<CubeUser?> createConnectyCubeSession(
     BuildContext context,
     { bool withSignUp = true }) async {
-  CubeSettings.instance.isDebugEnabled = true;
+  CubeSettings.instance.isDebugEnabled = false;
   MyCubeUser myCubeUser = context.read<MyCubeUser>();
 
   CubeUser user = CubeUser(

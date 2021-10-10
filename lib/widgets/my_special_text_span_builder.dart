@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,12 +26,12 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
       {TextStyle? textStyle,
       SpecialTextGestureTapCallback? onTap,
       required int index}) {
-    if (flag == '') {
+    if (flag.isEmpty) {
       return null;
     }
 
-    if (attachedImage != null) {
-      return ImageText(textStyle ?? TextStyle(fontSize: 12), attachedImage, null);
+    if (isStart(flag, ImageText.flag)) {
+      return ImageText(textStyle ?? TextStyle(fontSize: 12), attachedImg: attachedImage, start: index - (ImageText.flag.length - 1));
     }
 
     return null;
