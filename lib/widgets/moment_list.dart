@@ -267,7 +267,7 @@ class _MomentListState extends State<MomentList> {
                           // ),
                           ExtendedTextField(
                             expands: true,
-                        // specialTextSpanBuilder: MySpecialTextSpanBuilder(),
+                            specialTextSpanBuilder: MySpecialTextSpanBuilder(_image == null ? null : File(_image!.path)),
                             controller: _postTextController,
                         // selectionControls: _myExtendedMaterialTextSelectionControls,
                             maxLines: null,
