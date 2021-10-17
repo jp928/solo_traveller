@@ -25,13 +25,7 @@ class PeopleProfileScreen extends StatefulWidget {
 class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
   Profile? _profile;
 
-  bool loading = false;
-
   Future<void> _retrieveProfile(String userId) async {
-    setState(() {
-      loading = true;
-    });
-
     try {
       Profile? profile = await getUserProfile(id: userId);
       setState(() {
@@ -56,10 +50,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
             ],
           )
       );
-    } finally {
-      setState(() {
-        loading = false;
-      });
     }
   }
 
@@ -93,8 +83,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Person? person = ModalRoute.of(context)?.settings.arguments as Person;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xffF4F4F4),

@@ -37,6 +37,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   XFile? _image;
 
   Country? _country;
+  bool _validate = false;
 
   _imgFromCamera() async {
     XFile? image = await _picker.pickImage(
@@ -67,25 +68,19 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   }
 
   void _saveProfile(BuildContext context) async {
+    setState(() {
+      _validate = true;
+    });
     final isValid = _createProfileForm.currentState!.validate();
     if (!isValid) {
       return;
     }
 
     if (_country == null) {
-      showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-                title: const Text('No country selected'),
-                content: Text('Please select a country you are from.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, 'OK'),
-                    child: const Text('OK'),
-                  ),
-                ],
-              ));
+      return;
+    }
 
+    if (selectedDate == null) {
       return;
     }
 
@@ -149,6 +144,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                 ],
               ));
+    } finally {
+      setState(() {
+        _validate = false;
+      });
     }
 
     Navigator.pop(context);
@@ -230,7 +229,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 },
                 child: SingleChildScrollView(
                   child: Container(
-                      height: 720,
+                      height: 800,
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,7 +339,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                                   return null;
                                                 },
                                               ),
-                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              Padding(padding: EdgeInsets.only(top: 12)),
                                               TextFormField(
                                                 controller: _aboutController,
                                                 decoration: InputDecoration(
@@ -355,7 +354,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                                   return null;
                                                 },
                                               ),
-                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              Padding(padding: EdgeInsets.only(top: 12)),
                                               GestureDetector(
                                                 onTap: () {
                                                   showCountryPicker(
@@ -392,76 +391,108 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                                     ),
                                                   );
                                                 },
-                                                child: Container(
-                                                    height: 56,
-                                                    width: double.infinity,
-                                                    alignment:
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                        height: 56,
+                                                        width: double.infinity,
+                                                        alignment:
                                                         Alignment.centerLeft,
-                                                    padding: const EdgeInsets
+                                                        padding: const EdgeInsets
                                                             .symmetric(
-                                                        horizontal: 12),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
+                                                            horizontal: 12),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
                                                             BorderRadius
                                                                 .circular(6),
-                                                        border: Border.all(
-                                                          width: 1.6,
-                                                          color: Color.fromRGBO(
-                                                              218, 218, 236, 1),
-                                                        )),
-                                                    child: Text(_country == null
-                                                        ? 'Country you\'re from'
-                                                        : _country!
-                                                            .displayNameNoCountryCode)),
+                                                            border: Border.all(
+                                                              width: 1.6,
+                                                              color: _country == null &&  _validate ? Colors.red
+                                                                  : Color.fromRGBO(218, 218, 236, 1),
+                                                            )),
+                                                        child: Text(_country == null
+                                                            ? 'Country you\'re from'
+                                                            : _country!
+                                                            .displayNameNoCountryCode)
+                                                    ),
+                                                    Padding(padding: EdgeInsets.only(top: 8)),
+                                                    _country == null &&  _validate ? Text('Please select a country you come from.', style: TextStyle(
+                                                      color: Colors.red[600],
+                                                      fontSize: 12,
+                                                    ),) : Padding(padding: EdgeInsets.only(top: 0))
+                                                  ],
+                                                ),
                                               ),
-                                              Padding(padding: EdgeInsets.only(top: 8)),
-                                              Container(
-                                                  height: 56,
-                                                  width: double.infinity,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(horizontal: 2),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
+                                              Padding(padding: EdgeInsets.only(top: 12)),
+                                              ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  maxHeight: 80,
+                                                  minHeight: 56,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      height: 56,
+                                                      width: double.infinity,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(horizontal: 2),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
                                                           BorderRadius.circular(
                                                               6),
-                                                      border: Border.all(
-                                                        width: 1.6,
-                                                        color: Color.fromRGBO(
-                                                            218, 218, 236, 1),
-                                                      )),
-                                                  child: TextButton(
-                                                      child: Container(
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                                child: Text(
-                                                              selectedDate ==
-                                                                      null
-                                                                  ? 'Year of birth'
-                                                                  : DateFormat(
+                                                          border: Border.all(
+                                                            width: 1.6,
+                                                            color: selectedDate == null &&  _validate ? Colors.red
+                                                                : Color.fromRGBO(218, 218, 236, 1),
+                                                          )),
+                                                      child:
+                                                      TextButton(
+                                                          child: Container(
+                                                            child: Row(
+                                                              children: [
+                                                                Container(
+                                                                    child: Text(
+                                                                      selectedDate ==
+                                                                          null
+                                                                          ? 'Year of birth'
+                                                                          : DateFormat(
                                                                           'yyyy-MM-dd')
-                                                                      .format(
+                                                                          .format(
                                                                           selectedDate!),
-                                                              style: TextStyle(
-                                                                  // textBaseline: TextBaseline.alphabetic,
-                                                                  color:
-                                                                      placeholderGrey,
-                                                                  fontFamily:
-                                                                      'Roboto',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  fontSize: 16),
-                                                            ))
-                                                          ],
-                                                        ),
+                                                                      style: TextStyle(
+                                                                        // textBaseline: TextBaseline.alphabetic,
+                                                                          color:
+                                                                          placeholderGrey,
+                                                                          fontFamily:
+                                                                          'Roboto',
+                                                                          fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                          fontSize: 16),
+                                                                    ))
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            _showDatePicker(
+                                                                context);
+                                                          }
                                                       ),
-                                                      onPressed: () {
-                                                        _showDatePicker(
-                                                            context);
-                                                      })),
+                                                    ),
+                                                    Padding(padding: EdgeInsets.only(top: 8)),
+                                                    selectedDate == null && _validate ? Text('Please select date of birth.', style: TextStyle(
+                                                      color: Colors.red[600],
+                                                      fontSize: 12,
+                                                    ),)
+                                                        :
+                                                    Padding(padding: EdgeInsets.only(top: 0)),
+                                                  ],
+                                                )
+                                              ),
 
-                                              Padding(padding: EdgeInsets.only(top: 8)),
+                                              Padding(padding: EdgeInsets.only(top: 12)),
                                               Container(
                                                 height: 96,
                                                 width: double.infinity,
