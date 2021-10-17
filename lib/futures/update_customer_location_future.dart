@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
 
@@ -11,7 +12,7 @@ Future<bool> updateCustomerLocation(Position position) async {
   var tokenInfo = parseJwt(token!);
 
   final response = await http.post(
-    Uri.parse('https://solodevelopment.tk/user/save_location'),
+    Uri.parse('${API_URL}user/save_location'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'

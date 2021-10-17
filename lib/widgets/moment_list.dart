@@ -27,8 +27,13 @@ class _MomentListState extends State<MomentList> {
   bool loading = false;
   bool loadingMore = false;
 
+  bool sending = false;
+
   double _offset = 0;
   final String inserted = "${ImageText.flag}/>";
+
+  double initialInputHeight = 56;
+  FocusNode _focus = new FocusNode();
 
   @override
   void initState() {
@@ -36,6 +41,8 @@ class _MomentListState extends State<MomentList> {
     setState(() {
       loading = true;
     });
+
+    _focus.addListener(_onFocusChange);
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -60,11 +67,9 @@ class _MomentListState extends State<MomentList> {
     if (text.contains(this.inserted)) {
       text = text.replaceRange(0, this.inserted.length, '');
     }
-    
+
     final newText = "${this.inserted}$text";
-    _postTextController.value = TextEditingValue(
-      text: newText
-    );
+    _postTextController.value = TextEditingValue(text: newText);
   }
 
   Future<void> _retrievePosts(int pageNum, {bool isRefresh = false}) async {
@@ -88,12 +93,9 @@ class _MomentListState extends State<MomentList> {
 
   void _createPost() async {
     bool _createPostSuccess = false;
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Center(child: CircularProgressIndicator());
-        });
+    setState(() {
+      sending = true;
+    });
 
     String body = _postTextController.text;
     if (body.contains(this.inserted)) {
@@ -125,10 +127,13 @@ class _MomentListState extends State<MomentList> {
               ));
     } finally {
       // Dismiss loading
-      Navigator.pop(context);
+      setState(() {
+        sending = false;
+      });
     }
 
     if (_createPostSuccess) {
+      _postTextController.clear();
       _retrievePosts(1, isRefresh: true);
     }
   }
@@ -157,7 +162,7 @@ class _MomentListState extends State<MomentList> {
       _image = image!;
       _insertImageInTextField();
     });
-    
+
     Navigator.of(context).pop();
   }
 
@@ -190,9 +195,20 @@ class _MomentListState extends State<MomentList> {
         });
   }
 
+  void _onFocusChange() {
+    setState(() {
+      if (_focus.hasFocus) {
+        initialInputHeight = 120;
+      } else {
+        initialInputHeight = 56;
+      }
+    });
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -223,7 +239,7 @@ class _MomentListState extends State<MomentList> {
                             ],
                           ),
                         )
-                      : new NotificationListener(
+                      : NotificationListener(
                           child: RefreshIndicator(
                             child: ListView.separated(
                               key: PageStorageKey('post'),
@@ -247,7 +263,6 @@ class _MomentListState extends State<MomentList> {
                           onNotification: (t) {
                             if (t is ScrollEndNotification) {
                               _offset = _scrollController.position.pixels;
-                              print(_scrollController.position.pixels);
                             }
 
                             return true;
@@ -261,101 +276,81 @@ class _MomentListState extends State<MomentList> {
             child: SafeArea(
               top: false,
               child: ConstrainedBox(
-                  constraints: new BoxConstraints(
-                    minHeight: 60,
-                    maxHeight: 120,
-                  ),
-                  child: Container(
-                    padding:
-                    EdgeInsets.only(left: 10, right: 10),
-                    width: double.infinity,
-                    color: Color(0xffF4F4F4),
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          child:
-                          // TextField(
-                          //   controller: _postTextController,
-                          //   maxLines: 15,
-                          //   style: TextStyle(
-                          //     fontSize: 14.0,
-                          //   ),
-                          //   decoration: InputDecoration(
-                          //     hintText: 'Type a message',
-                          //     hintStyle: TextStyle(color: Colors.black54),
-                          //     border: InputBorder.none,
-                          //   ),
-                          // ),
-                          ExtendedTextField(
-                            expands: true,
-                            specialTextSpanBuilder: MySpecialTextSpanBuilder(_image == null ? null : File(_image!.path)),
-                            controller: _postTextController,
-                            // selectionControls: _myExtendedMaterialTextSelectionControls,
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              // border: OutlineInputBorder(borderSide: BorderSide(color: Color.fromRGBO(74, 90, 247, 1), width: 1)),
-                              border: InputBorder.none,
-                            ),
-
-                            // focusNode: _focusNode,
-                            // decoration: InputDecoration(
-                            //     suffixIcon: GestureDetector(
-                            //       onTap: () {
-                            //         setState(() {
-                            //           sessions.insert(0, _textEditingController.text);
-                            //           _textEditingController.value =
-                            //               _textEditingController.value.copyWith(
-                            //                   text: '',
-                            //                   selection:
-                            //                       const TextSelection.collapsed(offset: 0),
-                            //                   composing: TextRange.empty);
-                            //         });
-                            //       },
-                            //       child: const Icon(Icons.send),
-                            //     ),
-                            //     contentPadding: const EdgeInsets.all(12.0)
-                            //   ),
-                            //textDirection: TextDirection.rtl,
+                constraints: BoxConstraints(
+                  minHeight: 56,
+                  maxHeight: initialInputHeight,
+                ),
+                child: Container(
+                  padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+                  width: double.infinity,
+                  color: Color(0xffF4F4F4),
+                  child: Row(
+                    children: <Widget>[
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Expanded(
+                        child: ExtendedTextField(
+                          expands: true,
+                          focusNode: _focus,
+                          specialTextSpanBuilder: MySpecialTextSpanBuilder(
+                              _image == null ? null : File(_image!.path)),
+                          controller: _postTextController,
+                          // selectionControls: _myExtendedMaterialTextSelectionControls,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            // border: OutlineInputBorder(borderSide: BorderSide(color: Color.fromRGBO(74, 90, 247, 1), width: 1)),
+                            border: InputBorder.none,
                           ),
                         ),
-                        SizedBox(
-                          width: 8,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Ink(
+                        decoration: const ShapeDecoration(
+                          color: Colors.lightBlue,
+                          shape: CircleBorder(),
                         ),
-                        Ink(
-                          decoration: const ShapeDecoration(
-                            color: Colors.lightBlue,
-                            shape: CircleBorder(),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.photo_library_outlined),
-                            color: Colors.grey,
-                            onPressed: () {
-                              _showImagePicker(context);
-                            },
-                          ),
+                        child: IconButton(
+                          icon: const Icon(Icons.photo_library_outlined),
+                          color: Colors.grey,
+                          onPressed: () {
+                            _showImagePicker(context);
+                          },
                         ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        FloatingActionButton(
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Container(
+                        height: 46,
+                        child: FloatingActionButton(
                           shape: BeveledRectangleBorder(
                               borderRadius: BorderRadius.zero,
                               side: BorderSide(color: Colors.grey, width: 1)),
                           backgroundColor: Colors.transparent,
                           onPressed: () {
-                            _createPost();
+                            if (!sending) {
+                              _createPost();
+                            }
                           },
-                          child: Text(
+                          child: sending ?
+                          SizedBox(
+                            child: CircularProgressIndicator(strokeWidth: 2,),
+                            height: 16.0,
+                            width: 16.0,
+                          )
+                          :
+                          Text(
                             'Send',
                             style: TextStyle(color: Colors.grey),
                           ),
                           elevation: 0,
                         ),
-                      ],
-                    ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             )),

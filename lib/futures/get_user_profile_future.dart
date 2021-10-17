@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/models/profile.dart';
 
-Future<Profile> getUserProfile({ required String id }) async {
+Future<Profile> getUserProfile({required String id}) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
   final response = await http.get(
-    Uri.parse('https://solodevelopment.tk/user/profile?userId=$id'),
+    Uri.parse('${API_URL}user/profile?userId=$id'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
@@ -17,7 +18,6 @@ Future<Profile> getUserProfile({ required String id }) async {
 
   if (response.statusCode == 200 && response.body.isNotEmpty) {
     return Profile.fromJson(json.decode(response.body));
-
   } else {
     if (response.statusCode == 401) {
       await refreshToken();

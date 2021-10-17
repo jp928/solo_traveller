@@ -40,8 +40,7 @@ class _MomentListState extends State<PeopleNearMeList> {
     final location = _geolocatorPlatform.getPositionStream(
         desiredAccuracy: LocationAccuracy.medium,
         timeInterval: 3000,
-        timeLimit: Duration(hours: 1)
-    );
+        timeLimit: Duration(hours: 1));
 
     _positionStreamSubscription = location.handleError((error) {
       _positionStreamSubscription?.cancel();
@@ -198,19 +197,16 @@ class _MomentListState extends State<PeopleNearMeList> {
                                             id: person.id.toString(),
                                             width: 120,
                                             onTap: () {
-                                              Navigator.of(context).push(
-                                                  new MaterialPageRoute(
-                                                    builder: (context) =>
-                                                    new PeopleProfileScreen(userId: person.id),
-
-                                                    settings: RouteSettings(
-                                                      arguments: person,
+                                              Navigator.of(context)
+                                                  .push(new MaterialPageRoute(
+                                                builder: (context) =>
+                                                    new PeopleProfileScreen(
+                                                      userId: person.id,
+                                                      profileImage: person.profileImage ?? ''
                                                     ),
-                                                  )
-                                              );
+                                              ));
                                             },
-                                          )
-                                      ),
+                                          )),
                                       Text(
                                           '${person.firstName ?? 'Anonymous'} ${person.lastName ?? ''}'),
                                       Divider(

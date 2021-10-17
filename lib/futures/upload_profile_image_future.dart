@@ -9,6 +9,7 @@ import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:provider/src/provider.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'dart:io';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
@@ -24,8 +25,9 @@ Future<String> uploadProfileImage(File image, BuildContext context) async {
   }
 
   String userId = tokenInfo?['sub'];
-  var uri = Uri.parse('https://solodevelopment.tk/content/upload/profile?userId=$userId');
-  final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+  var uri = Uri.parse('${API_URL}content/upload/profile?userId=$userId');
+  final mimeTypeData =
+      lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
 
   // Initialize the multipart request
   final imageUploadRequest = http.MultipartRequest('POST', uri);
@@ -47,8 +49,7 @@ Future<String> uploadProfileImage(File image, BuildContext context) async {
     user?.avatar = profileImage['url'];
 
     if (user != null) {
-      uploadFile(image, isPublic: false)
-          .then((cubeFile) {
+      uploadFile(image, isPublic: false).then((cubeFile) {
         user.avatar = cubeFile.uid;
         return updateUser(user);
       }).onError((error, stackTrace) {

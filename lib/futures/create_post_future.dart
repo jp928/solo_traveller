@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
 
-Future<bool> createPost(String body, int? imageId, String? userId, String? firstName, String? lastName) async {
+Future<bool> createPost(String body, int? imageId, String? userId,
+    String? firstName, String? lastName) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
 
@@ -16,7 +18,7 @@ Future<bool> createPost(String body, int? imageId, String? userId, String? first
   }
 
   final response = await http.post(
-    Uri.parse('https://solodevelopment.tk/post/posts'),
+    Uri.parse('${API_URL}post/posts'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
@@ -33,7 +35,6 @@ Future<bool> createPost(String body, int? imageId, String? userId, String? first
 
   if (response.statusCode == 201) {
     return true;
-
   } else {
     if (response.statusCode == 401) {
       await refreshToken();

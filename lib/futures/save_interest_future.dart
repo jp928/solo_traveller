@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 
 Future<bool> saveInterest(List<int> interests) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
   final response = await http.post(
-    Uri.parse('https://solodevelopment.tk/user/save_interests'),
+    Uri.parse('${API_URL}user/save_interests'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
@@ -19,7 +20,6 @@ Future<bool> saveInterest(List<int> interests) async {
 
   if (response.statusCode == 200 || response.statusCode == 201) {
     return true;
-
   } else {
     if (response.statusCode == 401) {
       await refreshToken();

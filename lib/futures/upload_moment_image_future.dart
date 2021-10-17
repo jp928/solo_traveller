@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'dart:io';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/utilities/parse_jwt.dart';
@@ -21,8 +22,9 @@ Future<bool> uploadMomentImage(File image, String body) async {
   }
 
   String userId = tokenInfo?['sub'];
-  var uri = Uri.parse('https://solodevelopment.tk/content/upload/moment_image?userId=$userId');
-  final mimeTypeData = lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+  var uri = Uri.parse('${API_URL}content/upload/moment_image?userId=$userId');
+  final mimeTypeData =
+      lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
 
   // Initialize the multipart request
   final imageUploadRequest = http.MultipartRequest('POST', uri);

@@ -37,22 +37,24 @@ class Profile {
   @JsonKey(defaultValue: null, includeIfNull: false)
   String? profileImage;
 
+  @JsonKey(defaultValue: null, includeIfNull: false)
+  int? id;
+
   Profile(
     this.firstName,
-    this.dateOfBirth,
-    [
-      this.countryCode,
-      this.chatAccountId,
-      this.about,
-      this.profileImage,
-      this.settings,
-      this.momentCount = 0,
-      this.followerCount = 0,
-      this.followingCount = 0,
-      this.interests,
-      this.gender,
-    ]
-  );
+    this.dateOfBirth, [
+    this.countryCode,
+    this.chatAccountId,
+    this.about,
+    this.profileImage,
+    this.settings,
+    this.momentCount = 0,
+    this.followerCount = 0,
+    this.followingCount = 0,
+    this.interests,
+    this.gender,
+    this.id,
+  ]);
 
   factory Profile.fromJson(Map<String, dynamic> json) =>
       _$ProfileFromJson(json);

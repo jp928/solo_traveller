@@ -13,6 +13,7 @@ Post _$PostFromJson(Map<String, dynamic> json) => Post(
       json['profileImage'] as String?,
       json['imageUrl'] as String?,
       DateTime.parse(json['created'] as String),
+      json['ownerUserId'] as int,
     );
 
 Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
@@ -22,4 +23,5 @@ Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
       'profileImage': instance.profileImage,
       'imageUrl': instance.imageUrl,
       'created': instance.created.toIso8601String(),
+      'ownerUserId': instance.ownerUserId,
     };

@@ -1,16 +1,17 @@
-
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/models/post.dart';
 
-Future<List<Post>> getPosts({ int pageNum = 1, int pageSize = 20}) async {
+Future<List<Post>> getPosts({int pageNum = 1, int pageSize = 20}) async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   String? token = await secureStorage.read(key: 'token');
   final response = await http.get(
-    Uri.parse('https://solodevelopment.tk/post/posts?pageNo=${pageNum.toString()}&pageSize=${pageSize.toString()}'),
+    Uri.parse(
+        '${API_URL}post/posts?pageNo=${pageNum.toString()}&pageSize=${pageSize.toString()}'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
@@ -22,7 +23,6 @@ Future<List<Post>> getPosts({ int pageNum = 1, int pageSize = 20}) async {
 
     responseList.map((e) => print(e));
     return responseList.map((data) => Post.fromJson(data)).toList();
-
   } else {
     if (response.statusCode == 401) {
       await refreshToken();

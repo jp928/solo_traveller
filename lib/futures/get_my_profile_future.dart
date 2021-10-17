@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/models/profile.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
@@ -14,7 +15,7 @@ Future<Profile> getMyProfile() async {
   String userId = tokenInfo['sub'];
 
   final response = await http.get(
-    Uri.parse('https://solodevelopment.tk/user/profile?userId=$userId'),
+    Uri.parse('${API_URL}user/profile?userId=$userId'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'

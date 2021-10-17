@@ -2,12 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:solo_traveller/models/person.dart';
 import 'package:solo_traveller/models/post.dart';
+import 'package:solo_traveller/screens/people_profile_screen.dart';
 
 class PostItem extends StatelessWidget {
   final Post post;
 
-  PostItem({ required this.post });
+  PostItem({required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,6 @@ class PostItem extends StatelessWidget {
       child: ListTile(
         onTap: () {
           FocusScope.of(context).unfocus();
-          // print(news.web_link);
           // Navigator.push(context, MaterialPageRoute(builder: (context) => NewsDetailsPage(news)));
         },
         title: Container(
@@ -25,18 +26,24 @@ class PostItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              post.profileImage == null ?
-                Icon(
-                  Icons.camera_alt_outlined,
-                  size: 40,
-                  color: Colors.grey[800],
-                )
-                :
-                CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    post.profileImage!
-                  )
-                ),
+              post.profileImage == null
+                  ? Icon(
+                      Icons.camera_alt_outlined,
+                      size: 40,
+                      color: Colors.grey[800],
+                    )
+                  : GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => PeopleProfileScreen(
+                            userId: this.post.ownerUserId,
+                            profileImage: this.post.profileImage ?? ''
+                          ),
+                        ));
+                      },
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(post.profileImage!),
+                      )),
               Padding(padding: EdgeInsets.only(left: 10)),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -52,9 +59,9 @@ class PostItem extends StatelessWidget {
                         padding: EdgeInsets.only(left: 10),
                       ),
                       Text(
-                        DateFormat('yyyy-MM-dd HH:mm:ss').format(post.created),
-                        style: TextStyle(fontSize: 8, color: Colors.grey)
-                      )
+                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                              .format(post.created),
+                          style: TextStyle(fontSize: 8, color: Colors.grey))
                     ],
                   ),
                   Container(
@@ -72,16 +79,17 @@ class PostItem extends StatelessWidget {
             ],
           ),
         ),
-        subtitle: post.imageUrl == null ? null : Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Image(
-            fit: BoxFit.fitWidth,
-            width: MediaQuery.of(context).size.width - 64,
-            image: NetworkImage(
-                post.imageUrl!
-            ),
-          ),
-        ),
+        subtitle: post.imageUrl == null
+            ? null
+            : Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Image(
+                  fit: BoxFit.fitWidth,
+                  width: MediaQuery.of(context).size.width - 64,
+                  image: NetworkImage(post.imageUrl!),
+                ),
+              ),
       ),
     );
   }

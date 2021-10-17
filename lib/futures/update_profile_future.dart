@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/futures/refresh_token_future.dart';
 import 'package:solo_traveller/models/profile.dart';
 
@@ -10,7 +11,7 @@ Future<bool> updateProfile(Profile profile) async {
   String? token = await secureStorage.read(key: 'token');
 
   final response = await http.put(
-    Uri.parse('https://solodevelopment.tk/account/update_profile'),
+    Uri.parse('${API_URL}account/update_profile'),
     headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'

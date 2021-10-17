@@ -1,7 +1,7 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:solo_traveller/constants/config.dart';
 import 'package:solo_traveller/models/auth.dart';
 
 Future<bool> refreshToken() async {
@@ -10,7 +10,7 @@ Future<bool> refreshToken() async {
   String? refreshToken = await secureStorage.read(key: 'refreshToken');
 
   final response = await http.post(
-    Uri.parse('https://solodevelopment.tk/auth/refresh'),
+    Uri.parse('${API_URL}auth/refresh'),
     headers: <String, String>{
       'Content-Type': 'application/json',
     },

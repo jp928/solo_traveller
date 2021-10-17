@@ -9,12 +9,16 @@ class Post {
   String? profileImage;
   String? imageUrl;
   DateTime created;
+  int ownerUserId;
 
   String get fullName {
-    return this.firstName == null && this.lastName == null ? 'unknown' : "${this.firstName ?? ''} ${this.lastName ?? ''}";
+    return this.firstName == null && this.lastName == null
+        ? 'unknown'
+        : "${this.firstName ?? ''} ${this.lastName ?? ''}";
   }
 
-  Post(this.firstName, this.lastName, this.body, this.profileImage, this.imageUrl, this.created);
+  Post(this.firstName, this.lastName, this.body, this.profileImage,
+      this.imageUrl, this.created, this.ownerUserId);
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
 

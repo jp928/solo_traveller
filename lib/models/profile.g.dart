@@ -21,6 +21,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['followingCount'] as int? ?? 0,
       (json['interests'] as List<dynamic>?)?.map((e) => e as String?).toList(),
       json['gender'] as String?,
+      json['id'] as int?,
     );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) {
@@ -44,5 +45,6 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) {
   writeNotNull('interests', instance.interests);
   writeNotNull('gender', instance.gender);
   writeNotNull('profileImage', instance.profileImage);
+  writeNotNull('id', instance.id);
   return val;
 }

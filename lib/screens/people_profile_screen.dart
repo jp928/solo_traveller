@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:connectycube_sdk/connectycube_chat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:solo_traveller/futures/get_user_profile_future.dart';
-import 'package:solo_traveller/models/person.dart';
 import 'package:solo_traveller/models/profile.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/widgets/photo_hero.dart';
@@ -15,8 +12,10 @@ import 'chat_dialog_screen.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
   final int userId;
+  final String profileImage;
   PeopleProfileScreen({
     required this.userId,
+    required this.profileImage,
   });
 
   @override
@@ -26,12 +25,42 @@ class PeopleProfileScreen extends StatefulWidget {
 class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
   Profile? _profile;
 
-  Future<void> _retrieveProfile(String userId) async {
-    var profile = await getUserProfile(id: userId);
+  bool loading = false;
 
+  Future<void> _retrieveProfile(String userId) async {
     setState(() {
-      _profile = profile;
+      loading = true;
     });
+
+    try {
+      Profile? profile = await getUserProfile(id: userId);
+      setState(() {
+        _profile = profile;
+      });
+
+    } on Exception catch (e) {
+      await showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Failed'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          )
+      );
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   String calculateAge(String? birthDateStr) {
@@ -64,7 +93,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final person = ModalRoute.of(context)!.settings.arguments as Person;
+    // Person? person = ModalRoute.of(context)?.settings.arguments as Person;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,7 +103,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
           color: Color.fromRGBO(74, 90, 247, 1), //change your color here
         ),
         title: Text(
-          '${person.firstName}\'s profile',
+          '${_profile?.firstName ?? ''}\'s profile',
           style: TextStyle(color: Colors.black54),
         ),
       ),
@@ -84,44 +113,44 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
             showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Failed'),
-                  content: Text('Can\'t chat with this user.'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                )
-            );
+                      title: const Text('Failed'),
+                      content: Text('Can\'t chat with this user.'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'OK'),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ));
           } else {
             MyCubeUser myCubeUser = context.read<MyCubeUser>();
 
-            CubeDialog newDialog = CubeDialog(CubeDialogType.PRIVATE, occupantsIds: [
-              myCubeUser.user?.id ?? 0,
-              int.parse(_profile?.chatAccountId ?? '0')
-            ]);
+            CubeDialog newDialog = CubeDialog(CubeDialogType.PRIVATE,
+                occupantsIds: [
+                  myCubeUser.user?.id ?? 0,
+                  int.parse(_profile?.chatAccountId ?? '0')
+                ]);
             createDialog(newDialog).then((createdDialog) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ChatDialogScreen(myCubeUser.user!, createdDialog),
+                  builder: (context) =>
+                      ChatDialogScreen(myCubeUser.user!, createdDialog),
                 ),
               );
             }).onError((error, stackTrace) {
               showDialog<String>(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Failed'),
-                    content: Text(error.toString()),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, 'OK'),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  )
-              );
+                        title: const Text('Failed'),
+                        content: Text(error.toString()),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, 'OK'),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ));
             });
           }
 
@@ -134,7 +163,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
       body: Container(
         // Set background to blue to emphasize that it's a new route.
         // color: Colors.lightBlueAccent,
-        alignment: Alignment.topLeft,
+        alignment: Alignment.center,
         child: Column(
           children: [
             Container(
@@ -143,8 +172,8 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   PhotoHero(
-                    photo: person.profileImage,
-                    id: person.id.toString(),
+                    photo: widget.profileImage,
+                    id: widget.userId.toString(),
                     width: 64.0,
                     onTap: () {
                       Navigator.of(context).pop();
@@ -156,13 +185,13 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${person.firstName} ${person.lastName}',
+                      Text('${_profile?.firstName ?? ''}',
                           style: TextStyle(fontSize: 24)),
                       Padding(
                         padding: EdgeInsets.only(top: 8),
                       ),
                       Text(
-                        '${_profile?.gender ?? ''}, ${calculateAge(_profile?.dateOfBirth)}',
+                        '${_profile?.gender ?? 'Unknown gender'}, ${calculateAge(_profile?.dateOfBirth)}',
                       )
                     ],
                   )
@@ -253,8 +282,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                               //     style: GoogleFonts.getFont('Source Sans Pro',
                               //         color: Color(0xff4A4A4A)))
                             ],
-                          )
-                      ),
+                          )),
                     ],
                   )
                 ],
@@ -278,29 +306,28 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 12),
                   ),
-                Wrap(
-                    spacing: 8.0, // gap between adjacent chips
-                    runSpacing: 4.0, // gap between lines
-                    children: (_profile?.interests ?? []).map((interest) {
-                      return Container(
-                          height: 40,
-                          width: 108,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Color(0xff718CFB),
-                                radius: 16,
-                              ),
-                              Text(interest!,
-                                  style: TextStyle(
-                                      color: Color(0xff2E2F41), fontSize: 12)),
-                            ],
-                          )
-                      );
-                    }).toList()
-                  )
+                  Wrap(
+                      spacing: 8.0, // gap between adjacent chips
+                      runSpacing: 4.0, // gap between lines
+                      children: (_profile?.interests ?? []).map((interest) {
+                        return Container(
+                            height: 40,
+                            width: 108,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Color(0xff718CFB),
+                                  radius: 16,
+                                ),
+                                Text(interest!,
+                                    style: TextStyle(
+                                        color: Color(0xff2E2F41),
+                                        fontSize: 12)),
+                              ],
+                            ));
+                      }).toList())
                 ],
               ),
             ),
