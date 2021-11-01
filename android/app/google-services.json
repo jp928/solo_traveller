@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "680411664316",
+    "project_id": "solotraveller-557d7",
+    "storage_bucket": "solotraveller-557d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680411664316:android:0ad2e8b55c5e5271bea5b9",
+        "android_client_info": {
+          "package_name": "com.example.solo_traveller"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "680411664316-u0tdl8ajoednrucv90dfntfqs6sevrup.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.solo_traveller",
+            "certificate_hash": "019fa284b853d7b453519222343d31760bce640a"
+          }
+        },
+        {
+          "client_id": "680411664316-7rdcocpm9otelio4q1ppesvqgkv26teh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEfqg2gSDTuEzWYEVv_ngmjkSvl-sCnaA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "680411664316-7rdcocpm9otelio4q1ppesvqgkv26teh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "680411664316-88g7urcg90tqb4ptd63du6fr1i5knmun.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ionicframework.solotravellerapp837435",
+                "app_store_id": "967450470"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

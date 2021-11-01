@@ -7,13 +7,48 @@ import 'package:solo_traveller/providers/my_cube_session.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
 import 'package:solo_traveller/screens/login_screen.dart';
+import 'package:solo_traveller/utilities/subscribe_firebase_token.dart';
 import 'package:solo_traveller/widgets/round_gradient_button.dart';
 import 'package:connectycube_sdk/connectycube_sdk.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:io' show Platform;
 
-void main() {
+/// Initialize the [FlutterLocalNotificationsPlugin] package.
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+
+  if (Platform.isIOS) {
+    await firebaseMessaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+  }
   // Init ConnectyCube
   init('802', 'xfa-UKcGfX3q3q9', 'Ev3jDG52EKBKPDv');
+
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  /// Update the iOS foreground notification presentation options to allow
+  /// heads up notifications.
+  await firebaseMessaging.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
   runApp(
     /// Providers are above [MyApp] instead of inside it, so that tests
     /// can use [MyApp] while mocking the providers
@@ -56,10 +91,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         // backgroundColor: Color(0xffEFEFEF)
         // backgroundColor: Colors.red
         textSelectionTheme: TextSelectionThemeData(
-            cursorColor:  Color.fromRGBO(79, 152, 248, 1)
-        ),
+            cursorColor: Color.fromRGBO(79, 152, 248, 1)),
       ),
-
       supportedLocales: [
         Locale('en'),
       ],
@@ -74,31 +107,63 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   void initState() {
     super.initState();
 
-    // Firebase.initializeApp();
-
     init('802', 'xfa-UKcGfX3q3q9', 'Ev3jDG52EKBKPDv',
         onSessionRestore: () async {
-          return createSession(context.read<MyCubeUser>().user);
-        });
+      return createSession(context.read<MyCubeUser>().user);
+    });
+
+    // add listener for foreground push notifications
+    FirebaseMessaging.onMessage.listen((message) {
+      log('[onMessage] message: $message');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+
+      if (notification != null && android == null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode, notification.title, notification.body, null);
+        // flutterLocalNotificationsPlugin.show(
+        //     notification.hashCode,
+        //     notification.title,
+        //     notification.body,
+        //     NotificationDetails(
+        //       android: AndroidNotificationDetails(
+        //         channel.id,
+        //         channel.name,
+        //         channel.description,
+        //         // TODO add a proper drawable resource to android, for now using
+        //         //      one that already exists in example app.
+        //         icon: 'launch_background',
+        //       ),
+        //     ));
+      }
+    });
+
+    FirebaseMessaging.onBackgroundMessage((message) async {
+      RemoteNotification? notification = message.notification;
+      log('[onMessage] message: $message');
+      flutterLocalNotificationsPlugin.show(notification.hashCode,
+          notification?.title ?? '', notification?.body ?? '', null);
+      return Future.value();
+    });
 
     connectivityStateSubscription =
         Connectivity().onConnectivityChanged.listen((connectivityType) {
-          if (AppLifecycleState.resumed != appState) return;
+      if (AppLifecycleState.resumed != appState) return;
 
-          if (connectivityType != ConnectivityResult.none) {
-            log("chatConnectionState = ${CubeChatConnection.instance.chatConnectionState}");
-            bool isChatDisconnected =
-                CubeChatConnection.instance.chatConnectionState ==
+      if (connectivityType != ConnectivityResult.none) {
+        log("chatConnectionState = ${CubeChatConnection.instance.chatConnectionState}");
+        bool isChatDisconnected =
+            CubeChatConnection.instance.chatConnectionState ==
                     CubeChatConnectionState.Closed ||
-                    CubeChatConnection.instance.chatConnectionState ==
-                        CubeChatConnectionState.ForceClosed;
+                CubeChatConnection.instance.chatConnectionState ==
+                    CubeChatConnectionState.ForceClosed;
 
-            if (isChatDisconnected &&
-                CubeChatConnection.instance.currentUser != null) {
-              CubeChatConnection.instance.relogin();
-            }
-          }
-        });
+        if (isChatDisconnected &&
+            CubeChatConnection.instance.currentUser != null) {
+          CubeChatConnection.instance.relogin();
+        }
+      }
+    });
 
     appState = WidgetsBinding.instance!.lifecycleState!;
     WidgetsBinding.instance!.addObserver(this);
@@ -178,67 +243,65 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 36),
-          child: Column(
-            // Column is also a layout widget. It takes a list of children and
-            // arranges them vertically. By default, it sizes itself to fit its
-            // children horizontally, and tries to be as tall as its parent.
-            //
-            // Invoke "debug painting" (press "p" in the console, choose the
-            // "Toggle Debug Paint" action from the Flutter Inspector in Android
-            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-            // to see the wireframe for each widget.
-            //
-            // Column has various properties to control how it sizes itself and
-            // how it positions its children. Here we use mainAxisAlignment to
-            // center the children vertically; the main axis here is the vertical
-            // axis because Columns are vertical (the cross axis would be
-            // horizontal).
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Image.asset('assets/images/walkthrough.png'),
-              Padding(
+          child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 36),
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Invoke "debug painting" (press "p" in the console, choose the
+          // "Toggle Debug Paint" action from the Flutter Inspector in Android
+          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+          // to see the wireframe for each widget.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Image.asset('assets/images/walkthrough.png'),
+            Padding(
                 padding: EdgeInsets.symmetric(vertical: 30),
                 child: Text(
                   'Find and connect with people near you when you travel',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+                  style: const TextStyle(
+                      fontSize: 30, fontWeight: FontWeight.w400),
+                )),
+            Expanded(
+                child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                RoundedGradientButton(
+                  buttonText: 'Join',
+                  width: 120,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new GetStartScreen()));
+                  },
+                ),
+                RoundedGradientButton(
+                  transparent: true,
+                  buttonText: 'Login',
+                  width: 120,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new LoginScreen()));
+                  },
                 )
-              ),
-              Expanded(
-                child:  Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    RoundedGradientButton(
-                      buttonText: 'Join',
-                      width: 120,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(builder: (context) => new GetStartScreen())
-                        );
-                      },
-                    ),
-                    RoundedGradientButton(
-                      transparent: true,
-                      buttonText: 'Login',
-                      width: 120,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(builder: (context) => new LoginScreen())
-                        );
-                      },
-                    )
-                  ],
-                )
-              )
-            ],
-          ),
-        )
-      ),
+              ],
+            ))
+          ],
+        ),
+      )),
     );
   }
 }

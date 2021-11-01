@@ -17,6 +17,11 @@ class _MomentScreenState extends State<MomentScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: tabs.length, vsync: this);
+
+    // Dismiss keyboard
+    _tabController.addListener(() {
+      FocusScope.of(context).unfocus();
+    });
   }
 
   @override

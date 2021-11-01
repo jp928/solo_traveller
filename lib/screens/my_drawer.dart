@@ -7,6 +7,7 @@ import 'package:solo_traveller/providers/my_cube_session.dart';
 import 'package:solo_traveller/providers/my_cube_user.dart';
 import 'package:solo_traveller/screens/get_start_screen.dart';
 import 'package:solo_traveller/screens/my_profile_screen.dart';
+import 'package:solo_traveller/utilities/subscribe_firebase_token.dart';
 import 'package:solo_traveller/widgets/avatar.dart';
 
 import 'my_chats_screen.dart';
@@ -18,6 +19,8 @@ class MyDrawer extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    final PushNotificationManager _pushNotificationManager =
+        PushNotificationManager();
     await secureStorage.deleteAll();
 
     MyCubeUser cubeUser = context.read<MyCubeUser>();
@@ -28,13 +31,14 @@ class MyDrawer extends StatelessWidget {
 
     await signOut();
     await deleteSession();
+    _pushNotificationManager.unsubscribe();
 
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (BuildContext context) => GetStartScreen(),
       ),
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -54,24 +58,22 @@ class MyDrawer extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    // child: ClipOval(
-                    //   child: Icon(Icons.camera),
-                    //   // child: Image.asset(
-                    //   //   // "imgs/avatar.png",
-                    //   //   width: 80,
-                    //   // ),
-                    // ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      // child: ClipOval(
+                      //   child: Icon(Icons.camera),
+                      //   // child: Image.asset(
+                      //   //   // "imgs/avatar.png",
+                      //   //   width: 80,
+                      //   // ),
+                      // ),
 
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(50)),
-                      width: 64,
-                      height: 64,
-                      child: Avatar(image: user.profileImage)
-                    )
-                  ),
+                      child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(50)),
+                          width: 64,
+                          height: 64,
+                          child: Avatar(image: user.profileImage))),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -104,14 +106,11 @@ class MyDrawer extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.people),
                     title: const Text('My profile'),
-                    onTap: (){
+                    onTap: () {
                       Navigator.push(
                           context,
                           new MaterialPageRoute(
-                              builder: (context) => new MyProfileScreen()
-                          )
-                      );
-
+                              builder: (context) => new MyProfileScreen()));
                     },
                   ),
                   ListTile(
@@ -121,8 +120,7 @@ class MyDrawer extends StatelessWidget {
                       Navigator.push(
                           context,
                           new MaterialPageRoute(
-                              builder: (context) => new MyChatsScreen())
-                      );
+                              builder: (context) => new MyChatsScreen()));
                     },
                   ),
                   ListTile(

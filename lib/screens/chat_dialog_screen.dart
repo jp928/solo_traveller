@@ -375,7 +375,8 @@ class ChatScreenState extends State<ChatScreen> {
                                       ),
                                     ),
                                   ),
-                                  errorWidget: (context, url, error) => Material(
+                                  errorWidget: (context, url, error) =>
+                                      Material(
                                     child: Icon(
                                       Icons.error_outline,
                                       size: 200,
@@ -477,15 +478,17 @@ class ChatScreenState extends State<ChatScreen> {
                     backgroundColor: Colors.transparent,
                     radius: 24,
                     child: AavatarText(
-                      condition: _occupants[message.senderId]?.avatar != null &&
-                          _occupants[message.senderId]!.avatar!.isNotEmpty,
-                      text: _occupants[message.senderId]
-                          ?.fullName
-                          ?.substring(0, 2)
-                          .toUpperCase(),
-                      
-                      image: getPrivateUrlForUid(_occupants[message.senderId]!.avatar)
-                    ),
+                        condition: _occupants[message.senderId]?.avatar !=
+                                null &&
+                            _occupants[message.senderId]!.avatar!.isNotEmpty,
+                        text: _occupants[message.senderId]
+                            ?.fullName
+                            ?.substring(0, 2)
+                            .toUpperCase(),
+                        image: getPrivateUrlForUid(
+                            _occupants[message.senderId] == null
+                                ? null
+                                : _occupants[message.senderId]!.avatar)),
                   ),
                   borderRadius: BorderRadius.all(
                     Radius.circular(24),
@@ -743,7 +746,7 @@ class ChatScreenState extends State<ChatScreen> {
                 key: (item) => item.id, value: (item) => item)))
       ]);
       completer.complete(messages);
-    } catch (error) {
+    } on Exception catch (error) {
       completer.completeError(error);
     }
     return completer.future;
@@ -781,7 +784,6 @@ class ChatScreenState extends State<ChatScreen> {
       CubeChatConnection.instance.login(_cubeUser).catchError((error) {
         log(error.toString());
       });
-
 
       // CubeChatConnection.instance.connectionStateStream.listen((state) {
       //   log("[_initCubeChat] state $state");

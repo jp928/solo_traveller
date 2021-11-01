@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>680411664316-88g7urcg90tqb4ptd63du6fr1i5knmun.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.680411664316-88g7urcg90tqb4ptd63du6fr1i5knmun</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>680411664316-u0tdl8ajoednrucv90dfntfqs6sevrup.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBl_m3Hkm_Gjdww1RuNUd6leLsLNYvCk9s</string>
+	<key>GCM_SENDER_ID</key>
+	<string>680411664316</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ionicframework.solotravellerapp837435</string>
+	<key>PROJECT_ID</key>
+	<string>solotraveller-557d7</string>
+	<key>STORAGE_BUCKET</key>
+	<string>solotraveller-557d7.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:680411664316:ios:fe99f0021fd99295bea5b9</string>
+</dict>
+</plist>
