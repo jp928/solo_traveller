@@ -205,19 +205,19 @@ class GetStartScreen extends StatelessWidget {
                                       );
                                     },
                                   ),
-                                  Text('Prefer to log in with Facebook?'),
-                                  RoundedGradientButton(
-                                    transparent: true,
-                                    buttonText: 'Login with Facebook',
-                                    width: 300,
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          new MaterialPageRoute(
-                                              builder: (context) =>
-                                                  new LoginScreen()));
-                                    },
-                                  ),
+                                  // Text('Prefer to log in with Facebook?'),
+                                  // RoundedGradientButton(
+                                  //   transparent: true,
+                                  //   buttonText: 'Login with Facebook',
+                                  //   width: 300,
+                                  //   onPressed: () {
+                                  //     Navigator.pushReplacement(
+                                  //         context,
+                                  //         new MaterialPageRoute(
+                                  //             builder: (context) =>
+                                  //                 new LoginScreen()));
+                                  //   },
+                                  // ),
                                 ],
                               ),
                             )))

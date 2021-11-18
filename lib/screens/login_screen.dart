@@ -243,12 +243,12 @@ class LoginScreen extends StatelessWidget {
                                   onPressed: () => _login(context),
                                 ),
                                 Text('Can\'t login? Reset you password'),
-                                RoundedGradientButton(
-                                    transparent: true,
-                                    buttonText: 'Login with Facebook',
-                                    width: 300,
-                                    onPressed: () =>
-                                        _loginWithFacebook(context)),
+                                // RoundedGradientButton(
+                                //     transparent: true,
+                                //     buttonText: 'Login with Facebook',
+                                //     width: 300,
+                                //     onPressed: () =>
+                                //         _loginWithFacebook(context)),
                               ],
                             ),
                           )))
